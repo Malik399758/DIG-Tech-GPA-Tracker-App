@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../cons/routes/app_route.dart';
 import '../../viewmodel/grades/grade_view_model.dart';
 import '../gpa/add_subject_screen.dart';
+import '../gpa/analysis_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -14,6 +15,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+
 
   void showSemesterBottomSheet(
       BuildContext context,
@@ -87,7 +89,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         // NAME
                         Expanded(
                           child: Text(
-                            s["name"],
+                            s.name,
                             style: const TextStyle(
                               color: Colors.white,
                             ),
@@ -96,7 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                         // CREDIT
                         Text(
-                          "${s["credit"]} CH",
+                          "${s.credit} CH",
                           style: const TextStyle(
                             color: Colors.white70,
                           ),
@@ -106,7 +108,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                         // GRADE
                         Text(
-                          s["grade"],
+                          s.grade,
                           style: const TextStyle(
                             color: Color(0xFF14B8A6),
                             fontWeight: FontWeight.bold,
@@ -229,6 +231,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
 
                 const SizedBox(height: 20),
+               /* const Text(
+                  "Performance Overview",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),*/
 
                 // =====================
                 // 📊 STATS
@@ -239,7 +249,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Expanded(
                       child: _card(
                         title: "SGPA",
-                        value: vm.sgpa.toStringAsFixed(2),
+                        value: vm.sgpaBySemester(vm.currentSemester).toStringAsFixed(2),
                         icon: Icons.calculate,
                       ),
                     ),
@@ -346,42 +356,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // =====================
                 // 📈 INSIGHT CARD
                 // =====================
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.15),
+                    onTap: () {
+                      Future.microtask(() {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AnalysisScreen(),
+                          ),
+                        );
+                      });
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.15),
+                        ),
+                      ),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Performance Insight",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "📈 Your performance is improving steadily. Keep consistency to reach 4.0 CGPA.",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Text(
-                        "Performance Insight",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      SizedBox(height: 10),
-
-                      Text(
-                        "📈 Your performance is improving steadily. Keep consistency to reach 4.0 CGPA.",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                )
               ],
             ),
           ),

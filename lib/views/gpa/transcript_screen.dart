@@ -1,6 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
+import '../../model/subject_model.dart';
+import '../../utils/transcript_pdf.dart';
 import '../../viewmodel/grades/grade_view_model.dart';
 
 class TranscriptScreen extends StatelessWidget {
@@ -16,10 +19,28 @@ class TranscriptScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF0B1F3A),
 
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            onPressed: () async {
+
+              final allSubjects = vm.subjects;
+              final cgpa = vm.cgpa;
+
+              final pdf = await FullTranscriptPdf.generate(
+                subjects: allSubjects,
+                cgpa: cgpa,
+              );
+
+              await Printing.layoutPdf(
+                onLayout: (format) => pdf,
+              );
+            },
+          )
+        ],
         title: const Text("Transcript"),
         backgroundColor: const Color(0xFF0B1F3A),
         foregroundColor: Colors.white,
-        elevation: 0,
       ),
 
       body: Padding(
@@ -90,7 +111,8 @@ class TranscriptScreen extends StatelessWidget {
                 children: data.entries.map((entry) {
 
                   int sem = entry.key;
-                  List subjects = entry.value;
+                  List<SubjectModel> subjects =
+                  List<SubjectModel>.from(entry.value);
 
                   double sgpa = _calculateSGPA(subjects);
 
@@ -109,19 +131,22 @@ class TranscriptScreen extends StatelessWidget {
                         style: const TextStyle(color: Colors.white),
                       ),
 
+                      // ✅ FIXED HERE
                       subtitle: Text(
                         "SGPA: ${sgpa.toStringAsFixed(2)}",
-                        style: const TextStyle(color: Colors.white70),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                        ),
                       ),
 
                       children: subjects.map((s) {
                         return ListTile(
                           title: Text(
-                            s["name"],
+                            s.name,
                             style: const TextStyle(color: Colors.white),
                           ),
                           subtitle: Text(
-                            "CH: ${s["credit"]} | Grade: ${s["grade"]}",
+                            "CH: ${s.credit} | Grade: ${s.grade} | GP: ${_gradePoint(s.grade).toStringAsFixed(2)} | QP: ${(s.credit * _gradePoint(s.grade)).toStringAsFixed(2)}",
                             style: const TextStyle(
                               color: Colors.white70,
                             ),
@@ -151,18 +176,19 @@ class TranscriptScreen extends StatelessWidget {
     }
   }
 
-  double _calculateSGPA(List subjects) {
+  double _calculateSGPA(List<SubjectModel> subjects) {
     double totalPoints = 0;
     int totalCredits = 0;
 
     for (var s in subjects) {
-      int credit = s["credit"];
-      String grade = s["grade"];
-
-      totalPoints += credit * _gradePoint(grade);
-      totalCredits += credit;
+      totalPoints += s.credit * _gradePoint(s.grade);
+      totalCredits += s.credit;
     }
 
     return totalCredits == 0 ? 0 : totalPoints / totalCredits;
+  }
+
+  double _subjectGPA(SubjectModel s) {
+    return s.credit * _gradePoint(s.grade);
   }
 }

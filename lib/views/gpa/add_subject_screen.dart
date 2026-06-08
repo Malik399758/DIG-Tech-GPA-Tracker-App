@@ -293,19 +293,18 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              s["name"],
+                              s.name,
                               style: const TextStyle(color: Colors.white),
                             ),
                             Text(
-                              "Sem ${s["semester"]} | CH: ${s["credit"]} | Grade: ${s["grade"]}",
+                              "Sem ${s.semester} | CH: ${s.credit} | Grade: ${s.grade}",
                               style: const TextStyle(
                                 color: Colors.white70,
                                 fontSize: 12,
                               ),
                             ),
                           ],
-                        ),
-                        IconButton(
+                        ),                        IconButton(
                           onPressed: () => vm.deleteSubject(index),
                           icon: const Icon(Icons.delete, color: Colors.redAccent),
                         ),

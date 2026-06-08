@@ -2,12 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grade_flow/viewmodel/grades/grade_view_model.dart';
 import 'package:grade_flow/views/welcome/splash_screen.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
 import 'cons/routes/app_route.dart';
+import 'data/hive_boxes.dart';
+import 'model/subject_model.dart';
 
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(SubjectModelAdapter());
+
+  await Hive.openBox<SubjectModel>(
+    HiveBoxes.subjectBox,
+  );
   runApp(
     MultiProvider(
       providers: [
