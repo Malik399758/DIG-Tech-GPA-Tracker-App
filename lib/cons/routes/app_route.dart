@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../views/main/dashboard_screen.dart';
-import '../../views/main/semester_detail_screen.dart';
+import '../../views/semester/semester_detail_screen.dart';
 import '../../views/welcome/onboarding_screen.dart';
 import '../../views/welcome/splash_screen.dart';
 
@@ -40,8 +40,13 @@ class AppRoutes {
         );
 
       case AppRoutes.semesterDetail:
+
+        final semester = routeSettings.arguments as int;
+
         return MaterialPageRoute(
-          builder: (_) => const SemesterDetailScreen(),
+          builder: (_) => SemesterDetailScreen(
+            semester: semester,
+          ),
         );
 
       case gpa:

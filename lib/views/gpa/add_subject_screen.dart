@@ -24,6 +24,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   Widget build(BuildContext context) {
 
     final vm = Provider.of<GradeViewModel>(context);
+    final grouped = vm.groupedBySemester;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
@@ -153,9 +154,11 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                if (selectedCredit > 1) {
-                                  setState(() => selectedCredit--);
-                                }
+                                setState(() {
+                                  if (selectedCredit > 1) {
+                                    selectedCredit--;
+                                  }
+                                });
                               },
                               icon: const Icon(Icons.remove, color: Colors.white),
                             ),
@@ -272,47 +275,146 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
 
               const SizedBox(height: 10),
 
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: vm.subjects.length,
-                itemBuilder: (context, index) {
-                  final s = vm.subjects[index];
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(14),
+              // =====================
+// LIST (UPGRADED PROFESSIONAL)
+// =====================
+              const SizedBox(height: 10),
+
+              if (grouped.isEmpty)
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(14),
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    child: const Text(
+                      "No subjects added yet",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                )
+              else
+                ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: grouped.entries.map((entry) {
+                    final sem = entry.key;
+                    final subjects = entry.value;
+                    final sgpa = vm.sgpaBySemester(sem);
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.06),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white10),
+                      ),
+
+                      child: ExpansionTile(
+                        iconColor: Colors.tealAccent,
+                        collapsedIconColor: Colors.white70,
+                        childrenPadding: const EdgeInsets.only(bottom: 10),
+
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              s.name,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            Text(
-                              "Sem ${s.semester} | CH: ${s.credit} | Grade: ${s.grade}",
+                              "Semester $sem",
                               style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.teal.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                "${subjects.length} Subjects",
+                                style: const TextStyle(
+                                  color: Colors.tealAccent,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ],
-                        ),                        IconButton(
-                          onPressed: () => vm.deleteSubject(index),
-                          icon: const Icon(Icons.delete, color: Colors.redAccent),
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+
+                        subtitle: Text(
+                          "SGPA: ${sgpa.toStringAsFixed(2)}",
+                          style: const TextStyle(color: Colors.tealAccent),
+                        ),
+
+                        children: subjects.isEmpty
+                            ? [
+                          const Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              "No subjects in this semester",
+                              style: TextStyle(color: Colors.white54),
+                            ),
+                          )
+                        ]
+                            : subjects.map((s) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.04),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        s.name,
+                                        style: const TextStyle(color: Colors.white),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        "CH: ${s.credit} | Grade: ${s.grade}",
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                IconButton(
+                                  onPressed: () async {
+                                    await vm.deleteSubject(s);
+                                  },
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.redAccent,
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }).toList(),
+                ),
 
               const SizedBox(height: 20),
             ],
