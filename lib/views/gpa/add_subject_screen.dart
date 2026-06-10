@@ -253,6 +253,73 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                         selectedSemester,
                       );
 
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          duration: const Duration(seconds: 3),
+                          margin: const EdgeInsets.only(
+                            bottom: 0,
+                            left: 16,
+                            right: 16,
+                            top: 20,
+                          ),
+                          content: Align(
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0F172A),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: const Color(0xFF14B8A6), width: 1),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.check_circle,
+                                    color: Color(0xFF14B8A6),
+                                    size: 22,
+                                  ),
+                                  const SizedBox(width: 10),
+
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          "Subject Added",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "${subjectController.text} • Semester $selectedSemester",
+                                          style: const TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+
                       subjectController.clear();
                     }
                   },
@@ -262,161 +329,6 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                   ),
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              // =====================
-              // LIST (IMPORTANT FIX)
-              // =====================
-              const Text(
-                "Your Subjects",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-
-              const SizedBox(height: 10),
-
-
-              // =====================
-// LIST (UPGRADED PROFESSIONAL)
-// =====================
-              const SizedBox(height: 10),
-
-              if (grouped.isEmpty)
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Text(
-                      "No subjects added yet",
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ),
-                )
-              else
-                ListView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: grouped.entries.map((entry) {
-                    final sem = entry.key;
-                    final subjects = entry.value;
-                    final sgpa = vm.sgpaBySemester(sem);
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.06),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white10),
-                      ),
-
-                      child: ExpansionTile(
-                        iconColor: Colors.tealAccent,
-                        collapsedIconColor: Colors.white70,
-                        childrenPadding: const EdgeInsets.only(bottom: 10),
-
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Semester $sem",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.teal.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                "${subjects.length} Subjects",
-                                style: const TextStyle(
-                                  color: Colors.tealAccent,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        subtitle: Text(
-                          "SGPA: ${sgpa.toStringAsFixed(2)}",
-                          style: const TextStyle(color: Colors.tealAccent),
-                        ),
-
-                        children: subjects.isEmpty
-                            ? [
-                          const Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text(
-                              "No subjects in this semester",
-                              style: TextStyle(color: Colors.white54),
-                            ),
-                          )
-                        ]
-                            : subjects.map((s) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.04),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        s.name,
-                                        style: const TextStyle(color: Colors.white),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        "CH: ${s.credit} | Grade: ${s.grade}",
-                                        style: const TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                IconButton(
-                                  onPressed: () async {
-                                    await vm.deleteSubject(s);
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.redAccent,
-                                    size: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    );
-                  }).toList(),
-                ),
-
-              const SizedBox(height: 20),
             ],
           ),
         ),

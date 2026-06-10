@@ -117,42 +117,160 @@ class TranscriptScreen extends StatelessWidget {
                   double sgpa = _calculateSGPA(subjects);
 
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: ExpansionTile(
-                      iconColor: Colors.white,
-                      collapsedIconColor: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
 
-                      title: Text(
-                        "Semester $sem",
-                        style: const TextStyle(color: Colors.white),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFF1A2F4E),
+                          const Color(0xFF0B1F3A),
+                        ],
                       ),
 
-                      // ✅ FIXED HERE
-                      subtitle: Text(
-                        "SGPA: ${sgpa.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                          color: Colors.white70,
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.06),
+                      ),
+
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.35),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
                         ),
-                      ),
+                      ],
+                    ),
 
-                      children: subjects.map((s) {
-                        return ListTile(
-                          title: Text(
-                            s.name,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          subtitle: Text(
-                            "CH: ${s.credit} | Grade: ${s.grade} | GP: ${_gradePoint(s.grade).toStringAsFixed(2)} | QP: ${(s.credit * _gradePoint(s.grade)).toStringAsFixed(2)}",
-                            style: const TextStyle(
-                              color: Colors.white70,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+
+                      child: ExpansionTile(
+                        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        childrenPadding: const EdgeInsets.only(bottom: 16),
+
+                        iconColor: Colors.tealAccent,
+                        collapsedIconColor: Colors.white60,
+
+                        // ================= HEADER =================
+                        title: Row(
+                          children: [
+
+                            // LEFT TITLE
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Semester $sem",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 6),
+
+                                Text(
+                                  "${subjects.length} Subjects",
+                                  style: const TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        );
-                      }).toList(),
+
+                            const Spacer(),
+
+                            // SGPA BADGE (HERO ELEMENT)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.tealAccent.withOpacity(0.25),
+                                    Colors.teal.withOpacity(0.12),
+                                  ],
+                                ),
+                                border: Border.all(
+                                  color: Colors.tealAccent.withOpacity(0.25),
+                                ),
+                              ),
+                              child: Text(
+                                "SGPA ${sgpa.toStringAsFixed(2)}",
+                                style: const TextStyle(
+                                  color: Colors.tealAccent,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // ================= SUBJECT LIST =================
+                        children: subjects.map((s) {
+                          final gp = _gradePoint(s.grade);
+                          final qp = s.credit * gp;
+
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+
+                            padding: const EdgeInsets.all(14),
+
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.03),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.05),
+                              ),
+                            ),
+
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                // SUBJECT NAME
+                                Text(
+                                  s.name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                // ================= INFO GRID =================
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+
+                                    _chip("Credit ${s.credit}", Colors.white70,
+                                        Colors.white.withOpacity(0.06)),
+
+                                    _chip("Grade ${s.grade}", Colors.tealAccent,
+                                        Colors.teal.withOpacity(0.15)),
+
+                                    _chip("GP ${gp.toStringAsFixed(2)}", Colors.white70,
+                                        Colors.white.withOpacity(0.06)),
+
+                                    _chip("QP ${qp.toStringAsFixed(2)}", Colors.orangeAccent,
+                                        Colors.orange.withOpacity(0.12)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   );
                 }).toList(),
@@ -174,6 +292,65 @@ class TranscriptScreen extends StatelessWidget {
       case "D": return 2.0;
       default: return 0.0;
     }
+  }
+
+  Widget _chip(
+      String text,
+      Color textColor,
+      Color bg, {
+        IconData? icon,
+      }) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.06),
+        ),
+
+        // subtle depth (Play Store feel)
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+
+        children: [
+
+          // OPTIONAL ICON (makes it PRO)
+          if (icon != null) ...[
+            Icon(
+              icon,
+              size: 14,
+              color: textColor,
+            ),
+            const SizedBox(width: 6),
+          ],
+
+          // TEXT
+          Text(
+            text,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.1,
+              height: 1.0,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   double _calculateSGPA(List<SubjectModel> subjects) {

@@ -255,6 +255,19 @@ class GradeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Delete Entire function
+  Future<void> deleteSemester(int semester) async {
+    final subjectsToDelete = _box.values
+        .where((s) => s.semester == semester)
+        .toList();
+
+    for (final subject in subjectsToDelete) {
+      await subject.delete();
+    }
+
+    notifyListeners();
+  }
+
   // =====================
   // GRADE POINT
   // =====================
