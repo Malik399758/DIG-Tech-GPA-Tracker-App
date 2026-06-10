@@ -30,7 +30,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
       backgroundColor: const Color(0xFF0B1F3A),
 
       appBar: AppBar(
-        title: const Text("Add Subject"),
+        title: const Text("Add Semester"),
         backgroundColor: const Color(0xFF0B1F3A),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -96,7 +96,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? const Color(0xFF1E3A8A)
+                              ? const Color(0xFF14B8A6)
                               : Colors.white.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
                           border: isSelected

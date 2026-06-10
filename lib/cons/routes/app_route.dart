@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../views/main/dashboard_screen.dart';
 import '../../views/semester/semester_detail_screen.dart';
 import '../../views/welcome/onboarding_screen.dart';
+import '../../views/welcome/profile_screen.dart';
 import '../../views/welcome/splash_screen.dart';
 
 class AppRoutes {
@@ -10,6 +11,7 @@ class AppRoutes {
   static const String splash = "/";
   static const String onboarding = "/onboarding";
   static const String dashboard = "/dashboard";
+  static const String profile = "/profile";
 
 
   static const String gpa = "/gpa";
@@ -32,6 +34,11 @@ class AppRoutes {
       case onboarding:
         return MaterialPageRoute(
           builder: (_) => OnboardingScreen(),
+        );
+
+      case AppRoutes.profile:
+        return MaterialPageRoute(
+          builder: (_) => const ProfileSetupScreen(),
         );
 
       case dashboard:

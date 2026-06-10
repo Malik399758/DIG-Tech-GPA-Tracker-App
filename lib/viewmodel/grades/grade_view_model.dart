@@ -355,4 +355,24 @@ class GradeViewModel extends ChangeNotifier {
       };
     }).toList();
   }
+
+  /// subject update
+  Future<void> updateSubject(SubjectModel subject) async {
+    await subject.save(); // Hive object already knows its box
+    notifyListeners();
+  }
+
+  /// semester update
+  Future<void> updateSemester(int oldSem, int newSem) async {
+    final box = HiveBoxes.getSubjects(); // ✅ SAFE & CORRECT
+
+    for (var item in box.values) {
+      if (item.semester == oldSem) {
+        item.semester = newSem;
+        await item.save(); // persists correctly
+      }
+    }
+
+    notifyListeners();
+  }
 }

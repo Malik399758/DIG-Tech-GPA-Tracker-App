@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:grade_flow/cons/routes/app_route.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../core/storage/app_prefs.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -187,18 +190,30 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      final appPrefs = AppPrefs(prefs);
 
                       if (index == pages.length - 1) {
-                        // NEXT SCREEN HERE (Dashboard)
-                        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+
+                        // mark onboarding done
+                        await appPrefs.setOnboardingDone();
+
+                        // check profile status
+                        final isProfileDone = appPrefs.isProfileDone;
+
+                        if (isProfileDone) {
+                          Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+                        } else {
+                          Navigator.pushReplacementNamed(context, "/profile");
+                        }
+
                       } else {
                         controller.nextPage(
                           duration: const Duration(milliseconds: 350),
                           curve: Curves.easeInOut,
                         );
                       }
-
                     },
                     child: Text(
                       index == pages.length - 1

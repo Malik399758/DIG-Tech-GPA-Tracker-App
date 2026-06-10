@@ -1,455 +1,308 @@
 import 'package:flutter/material.dart';
+import 'package:grade_flow/views/gpa/add_subject_screen.dart';
+import 'package:grade_flow/views/gpa/analysis_screen.dart';
 import 'package:grade_flow/views/gpa/transcript_screen.dart';
+import 'package:grade_flow/views/main/semester_add_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../cons/routes/app_route.dart';
+import '../../core/storage/app_prefs.dart';
 import '../../viewmodel/grades/grade_view_model.dart';
-import '../gpa/add_subject_screen.dart';
-import '../gpa/analysis_screen.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
-}
+  Widget build(BuildContext context) {
+    final vm = Provider.of<GradeViewModel>(context);
+    final appPrefs = context.watch<AppPrefs>();
 
-class _DashboardScreenState extends State<DashboardScreen> {
+    if (vm.subjects.isEmpty) {
+      return EmptyDashboardScreen(
+        onCreateSemester: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AddSubjectScreen(),
+            ),
+          );
+        },
+      );
+    }
 
-
-  void showSemesterBottomSheet(
-      BuildContext context,
-      GradeViewModel vm,
-      int sem,
-      ) {
-    final subjects = vm.subjectsBySemester(sem);
-    final sgpa = vm.sgpaBySemester(sem);
-
-    showModalBottomSheet(
-      context: context,
+    return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Padding(
+
+      body: SafeArea(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
 
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
 
-              // HEADER
-              Text(
-                "Semester $sem",
-                style: const TextStyle(
+              // ================= HEADER =================
+              const Text(
+                "Dashboard",
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
 
               Text(
-                "SGPA: ${sgpa.toStringAsFixed(2)}",
-                style: const TextStyle(
-                  color: Color(0xFF14B8A6),
+                "Track your academic progress",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 13,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // ================= PROFILE CARD =================
+              _profileCard(appPrefs),
+
+              const SizedBox(height: 16),
+
+              // ================= CGPA CARD =================
+              _cgpaCard(vm),
+
+              const SizedBox(height: 16),
+
+              // ================= STATS =================
+              Row(
+                children: [
+                  Expanded(
+                    child: _miniCard(
+                      "SGPA",
+                      vm.sgpaBySemester(vm.currentSemester).toStringAsFixed(2),
+                      Icons.trending_up,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _miniCard(
+                      "Semesters",
+                      vm.currentSemester.toString(),
+                      Icons.school,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 18),
+
+              // ================= QUICK ACTIONS =================
+              const Text(
+                "Quick Actions",
+                style: TextStyle(
+                  color: Colors.white,
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
 
-              const SizedBox(height: 10),
-              const Divider(color: Colors.white24),
+              const SizedBox(height: 12),
 
-              const SizedBox(height: 10),
-
-              // SUBJECT LIST
-              subjects.isEmpty
-                  ? const Text(
-                "No subjects found",
-                style: TextStyle(color: Colors.white70),
-              )
-                  : Column(
-                children: subjects.map((s) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-
-                        // NAME
-                        Expanded(
-                          child: Text(
-                            s.name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-
-                        // CREDIT
-                        Text(
-                          "${s.credit} CH",
-                          style: const TextStyle(
-                            color: Colors.white70,
-                          ),
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        // GRADE
-                        Text(
-                          s.grade,
-                          style: const TextStyle(
-                            color: Color(0xFF14B8A6),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-  @override
-  Widget build(BuildContext context) {
-    final vm = Provider.of<GradeViewModel>(context);
-    return Scaffold(
-      body: Container(
-        height: double.infinity,
-
-        // 🌌 PREMIUM GRADIENT BACKGROUND
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF0B1F3A),
-              Color(0xFF0F2A5F),
-              Color(0xFF111827),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                // =====================
-                // 🏆 HEADER
-                // =====================
-                const Text(
-                  "Welcome Back 👋",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                const Text(
-                  "Your academic performance overview",
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // =====================
-                // 🎓 HERO CGPA CARD
-                // =====================
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF1E3A8A),
-                        Color(0xFF14B8A6),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Text(
-                        "Current CGPA",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-
-                      SizedBox(height: 10),
-
-                      Text(
-                        vm.cgpa.toStringAsFixed(2),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 42,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      SizedBox(height: 6),
-
-                      Text(
-                        "🔥 Excellent academic performance",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-               /* const Text(
-                  "Performance Overview",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),*/
-
-                // =====================
-                // 📊 STATS
-                // =====================
-                Row(
-                  children: [
-
-                    Expanded(
-                      child: _card(
-                        title: "SGPA",
-                        value: vm.sgpaBySemester(vm.currentSemester).toStringAsFixed(2),
-                        icon: Icons.calculate,
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    Expanded(
-                      child: _card(
-                        title: "Semesters",
-                        value: vm.currentSemester.toString(),
-                        icon: Icons.school,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 25),
-
-                // =====================
-                // ⚡ QUICK ACTIONS
-                // =====================
-                const Text(
-                  "Quick Actions",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                Row(
-                  children: [
-
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AddSubjectScreen(),
-                            ),
-                          );
-                        },
-                        child: _action(
-                          icon: Icons.add,
-                          title: "Add Subject",
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const TranscriptScreen(),
-                            ),
-                          );
-                        },
-                        child: _action(
-                          icon: Icons.menu_book,
-                          title: "Transcript",
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 25),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.semesterDetail,
-                      arguments: vm.currentSemester,
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E3A8A),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "View Semester Details",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 25),
-
-                // =====================
-                // 📈 INSIGHT CARD
-                // =====================
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(18),
-                    onTap: () {
-                      Future.microtask(() {
+              Row(
+                children: [
+                  Expanded(
+                    child: _actionCard(
+                      icon: Icons.add,
+                      title: "Add Semester",
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const AnalysisScreen(),
+                            builder: (_) => const AddSubjectScreen(),
                           ),
                         );
-                      });
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.15),
-                        ),
-                      ),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Performance Insight",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "📈 Your performance is improving steadily. Keep consistency to reach 4.0 CGPA.",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
+                      },
                     ),
                   ),
-                )
-              ],
-            ),
+
+                  const SizedBox(width: 10),
+
+                  Expanded(
+                    child: _actionCard(
+                      icon: Icons.menu_book,
+                      title: "Transcript",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const TranscriptScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              _primaryButton(
+                "View Semester Details",
+                Icons.arrow_forward_ios,
+                    () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.semesterDetail,
+                    arguments: vm.currentSemester,
+                  );
+                },
+              ),
+
+              const SizedBox(height: 18),
+
+              // ================= INSIGHT CARD =================
+              InsightCard(onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                    AnalysisScreen()));
+              },),
+
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // =====================
-  Widget _card({
-    required String title,
-    required String value,
-    required IconData icon,
-  }) {
+  // =========================================================
+  // PROFILE CARD
+  // =========================================================
+  Widget _profileCard(AppPrefs prefs) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.15)),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E3A8A), Color(0xFF14B8A6)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 24,
+            backgroundColor: Colors.white24,
+            child: Icon(Icons.person, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  prefs.getName(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  prefs.getUniversity(),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              "STUDENT",
+              style: TextStyle(color: Colors.white, fontSize: 10),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =========================================================
+  // CGPA CARD
+  // =========================================================
+  Widget _cgpaCard(GradeViewModel vm) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
-          Icon(icon, color: const Color(0xFF14B8A6)),
-
+          const Text(
+            "Current CGPA",
+            style: TextStyle(color: Colors.white70, fontSize: 13),
+          ),
           const SizedBox(height: 10),
 
           Text(
-            value,
+            vm.cgpa.toStringAsFixed(2),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 40,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
 
+          const Text(
+            "Excellent academic performance 🚀",
+            style: TextStyle(color: Colors.tealAccent, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =========================================================
+  // MINI CARD
+  // =========================================================
+  Widget _miniCard(String title, String value, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.tealAccent, size: 20),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           Text(
             title,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 11,
             ),
           ),
         ],
@@ -457,35 +310,325 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // =====================
-  Widget _action({
+  // =========================================================
+  // ACTION CARD
+  // =========================================================
+  Widget _actionCard({
     required IconData icon,
     required String title,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.15)),
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.tealAccent),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+          ],
+        ),
       ),
-      child: Column(
-        children: [
+    );
+  }
 
-          Icon(icon, color: const Color(0xFF14B8A6), size: 28),
+  // =========================================================
+  // PRIMARY BUTTON
+  // =========================================================
+  Widget _primaryButton(String title, IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1E3A8A), Color(0xFF14B8A6)],
+          ),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          const SizedBox(height: 10),
+  // =========================================================
+  // INSIGHT CARD
+  // =========================================================
 
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
+
+
+  Widget _emptyDashboard(BuildContext context) {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            // ================= ICON =================
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF14B8A6).withOpacity(0.25),
+                    const Color(0xFF1E3A8A).withOpacity(0.25),
+                  ],
+                ),
+              ),
+              child: const Icon(
+                Icons.school_outlined,
+                size: 42,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            // ================= TITLE =================
+            const Text(
+              "No Semester Added Yet",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // ================= DESCRIPTION =================
+            const Text(
+              "Start by adding your first semester to track SGPA, CGPA and academic progress.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+                height: 1.4,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ================= PRIMARY BUTTON =================
+            Container(
+              width: double.infinity,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1E3A8A), Color(0xFF14B8A6)],
+                ),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, "/subject");
+                },
+                child: const Text(
+                  "Add First Semester",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ================= SECONDARY ACTION =================
+            TextButton(
+              onPressed: () {
+                // optional: load demo data
+              },
+              child: const Text(
+                "Explore Demo Data",
+                style: TextStyle(color: Colors.white60),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class InsightCard extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const InsightCard({
+    super.key,
+    required this.onTap,
+  });
+
+  @override
+  State<InsightCard> createState() => _InsightCardState();
+}
+
+class _InsightCardState extends State<InsightCard>
+    with SingleTickerProviderStateMixin {
+
+  late AnimationController _controller;
+  late Animation<double> _fade;
+  late Animation<double> _scale;
+
+  bool _pressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _fade = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _scale = Tween<double>(begin: 0.95, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _fade.value,
+          child: Transform.scale(
+            scale: _scale.value * (_pressed ? 0.98 : 1),
+            child: GestureDetector(
+              onTapDown: (_) => setState(() => _pressed = true),
+              onTapUp: (_) => setState(() => _pressed = false),
+              onTapCancel: () => setState(() => _pressed = false),
+              onTap: widget.onTap,
+
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withOpacity(0.08),
+                      Colors.white.withOpacity(0.04),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: const Color(0xFF14B8A6).withOpacity(0.25),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.25),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    Text(
+                      "Performance Insight",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+
+                    SizedBox(height: 10),
+
+                    Text(
+                      "Strong progress. Stay consistent for top results.",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        height: 1.5,
+                      ),
+                    ),
+
+                    SizedBox(height: 12),
+
+                    Row(
+                      children: [
+
+                        Icon(
+                          Icons.insights,
+                          size: 16,
+                          color: Color(0xFF14B8A6),
+                        ),
+
+                        SizedBox(width: 6),
+
+                        Text(
+                          "Tap to view analytics",
+                          style: TextStyle(
+                            color: Color(0xFF14B8A6),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

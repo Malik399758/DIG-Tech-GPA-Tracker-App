@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../model/subject_model.dart';
 import '../../viewmodel/grades/grade_view_model.dart';
 
 class SemesterDetailScreen extends StatefulWidget {
@@ -12,108 +13,287 @@ class SemesterDetailScreen extends StatefulWidget {
   State<SemesterDetailScreen> createState() => _SemesterDetailScreenState();
 }
 
-class _SemesterDetailScreenState extends State<SemesterDetailScreen> {
-  void _showDeleteSemesterDialog(
-    BuildContext context,
-    GradeViewModel vm,
-    int semester,
-  ) {
+class _SemesterDetailScreenState extends State<SemesterDetailScreen>
+    with SingleTickerProviderStateMixin {
+
+  late AnimationController _controller;
+  late Animation<double> _fade;
+  late Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.05),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _showDeleteSemesterDialog(BuildContext context, GradeViewModel vm, int sem) {
     showDialog(
       context: context,
-      builder: (_) {
-        return Dialog(
-          backgroundColor: const Color(0xFF132A4A),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF132A4A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Delete Semester", style: TextStyle(color: Colors.white)),
+        content: Text(
+          "Semester $sem will be permanently removed.",
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel",style: GoogleFonts.poppins(
+              color: Colors.white
+            ),),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.delete_forever_rounded,
-                    color: Colors.redAccent,
-                    size: 34,
-                  ),
-                ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              await vm.deleteSemester(sem);
+              Navigator.pop(context);
+            },
+            child: Text("Delete",style: GoogleFonts.poppins(
+              color: Colors.white
+            ),),
+          ),
+        ],
+      ),
+    );
+  }
 
-                const SizedBox(height: 20),
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<GradeViewModel>();
+    final grouped = vm.groupedBySemester;
 
-                const Text(
-                  "Delete Semester",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+    return Scaffold(
+      backgroundColor: const Color(0xFF0B1F3A),
 
-                const SizedBox(height: 10),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0B1F3A),
+        title: const Text("Semester Overview"),
+      ),
 
-                Text(
-                  "Semester $semester and all associated subjects will be permanently removed.",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white70, height: 1.5),
-                ),
+      body: FadeTransition(
+        opacity: _fade,
+        child: SlideTransition(
+          position: _slide,
+          child: grouped.isEmpty
+              ? _emptyState()
+              : ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: grouped.length,
+            itemBuilder: (context, index) {
+              final sem = grouped.keys.elementAt(index);
+              final subjects = grouped[sem]!;
+              final sgpa = vm.sgpaBySemester(sem);
 
-                const SizedBox(height: 24),
+              return _semesterCard(
+                context,
+                vm,
+                sem,
+                subjects,
+                sgpa,
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
 
-                Row(
+  // ================= SEMESTER CARD =================
+  Widget _semesterCard(
+      BuildContext context,
+      GradeViewModel vm,
+      int sem,
+      List subjects,
+      double sgpa,
+      ) {
+    return TweenAnimationBuilder(
+      duration: const Duration(milliseconds: 400),
+      tween: Tween<double>(begin: 0.95, end: 1),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 14),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF132A4A), Color(0xFF0F223D)],
+              ),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+
+              child: ExpansionTile(
+                collapsedIconColor: Color(0xFF14B8A6),
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+
+                // HEADER
+                title: Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: Colors.white.withOpacity(.15),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: const Text(
-                          "Cancel",
-                          style: TextStyle(color: Colors.white70),
+                      child: Text(
+                        "Semester $sem",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
 
-                    const SizedBox(width: 12),
-
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await vm.deleteSemester(semester);
-
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                    // FIXED RIGHT MENU
+                    PopupMenuButton(
+                      color: const Color(0xFF1A355C),
+                      icon: const Icon(Icons.more_vert, color: Colors.white60),
+                      itemBuilder: (_) => [
+                        PopupMenuItem(
+                          value: "edit",
+                          child: Row(
+                            children: const [
+                              Icon(Icons.edit_outlined, color: Colors.tealAccent),
+                              SizedBox(width: 10),
+                              Text("Edit Semester", style: TextStyle(color: Colors.white)),
+                            ],
                           ),
                         ),
-                        child: const Text(
-                          "Delete",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+
+                        PopupMenuItem(
+                          value: "delete",
+                          child: Row(
+                            children: const [
+                              Icon(Icons.delete_outline, color: Colors.redAccent),
+                              SizedBox(width: 10),
+                              Text("Delete Semester", style: TextStyle(color: Colors.white)),
+                            ],
                           ),
                         ),
-                      ),
+                      ],
+                      onSelected: (value) {
+                        if (value == "delete") {
+                          _showDeleteSemesterDialog(context, vm, sem);
+                        }
+
+                        if (value == "edit") {
+                          _showEditSemesterDialog(context, vm, sem);
+                        }
+                      },
                     ),
                   ],
                 ),
-              ],
+
+                children: [
+                  const SizedBox(height: 8),
+
+                  // CHIPS
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        _chip("${subjects.length} Subjects"),
+                        const SizedBox(width: 10),
+                        _chip("SGPA ${sgpa.toStringAsFixed(2)}"),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // SUBJECT LIST
+                  ...subjects.map((s) {
+                    return TweenAnimationBuilder(
+                      duration: const Duration(milliseconds: 300),
+                      tween: Tween<double>(begin: 0, end: 1),
+                      builder: (context, v, child) {
+                        return Opacity(
+                          opacity: v,
+                          child: Transform.translate(
+                            offset: Offset(20 * (1 - v), 0),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.03),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          s.name,
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                        Text(
+                                          "Credit ${s.credit} • Grade ${s.grade}",
+                                          style: const TextStyle(color: Colors.white54, fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+
+                                      // ✏️ EDIT BUTTON
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, color: Colors.tealAccent),
+                                        onPressed: () {
+                                          _showEditSubjectDialog(context, vm, s);
+                                        },
+                                      ),
+
+                                      // 🗑 DELETE BUTTON
+                                      IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                                        onPressed: () async {
+                                          await vm.deleteSubject(s);
+
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              backgroundColor: Colors.redAccent,
+                                              content: Text("${s.name} deleted"),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }),
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
           ),
         );
@@ -121,295 +301,352 @@ class _SemesterDetailScreenState extends State<SemesterDetailScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final vm = Provider.of<GradeViewModel>(context);
-
-    // 🔥 ALL SEMESTERS GROUPED
-    final grouped = vm.groupedBySemester;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF0B1F3A),
-
-      appBar: AppBar(
-        title: const Text("Semester Overview"),
-        backgroundColor: const Color(0xFF0B1F3A),
-      ),
-
-      body: grouped.isEmpty
-          ? Center(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Text(
-                  "No subjects added yet",
-                  style: TextStyle(color: Colors.white70),
-                ),
-              ),
-            )
-          : ListView(
-              padding: const EdgeInsets.all(16),
-
-              children: grouped.entries.map((entry) {
-                final sem = entry.key;
-                final subjects = entry.value;
-                final sgpa = vm.sgpaBySemester(sem);
-
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF132A4A), Color(0xFF0F223D)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    // color: Colors.white.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.06)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.35),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-
-                  child: Theme(
-                    data: Theme.of(
-                      context,
-                    ).copyWith(dividerColor: Colors.transparent),
-
-                    child: ExpansionTile(
-                      trailing: SizedBox(),
-                      tilePadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      childrenPadding: const EdgeInsets.only(bottom: 12),
-
-                      iconColor: Colors.tealAccent,
-                      collapsedIconColor: Colors.white60,
-
-                      // ================= HEADER =================
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                "Semester $sem",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-
-                              const Spacer(),
-
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: PopupMenuButton<String>(
-                                  padding: EdgeInsets.zero,
-                                  tooltip: "Options",
-
-                                  color: const Color(0xFF1A355C),
-                                  elevation: 15,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-
-                                  icon: Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.05),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.more_vert_rounded,
-                                      color: Colors.white60,
-                                      size: 18,
-                                    ),
-                                  ),
-
-                                  itemBuilder: (_) => [
-                                    PopupMenuItem(
-                                      value: "delete",
-                                      child: Row(
-                                        children: const [
-                                          Icon(Icons.delete_outline, color: Colors.redAccent),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            "Delete Semester",
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-
-                                  onSelected: (value) {
-                                    if (value == "delete") {
-                                      _showDeleteSemesterDialog(context, vm, sem);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          // ================= CHIPS =================
-                          Row(
-                            children: [
-                              _chip(
-                                "${subjects.length} Subjects",
-                                Colors.tealAccent,
-                                Colors.teal.withOpacity(0.15),
-                              ),
-
-                              const SizedBox(width: 10),
-
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.tealAccent.withOpacity(0.25),
-                                      Colors.teal.withOpacity(0.12),
-                                    ],
-                                  ),
-                                  border: Border.all(
-                                    color: Colors.tealAccent.withOpacity(0.25),
-                                  ),
-                                ),
-                                child: Text(
-                                  "SGPA ${sgpa.toStringAsFixed(2)}",
-                                  style: const TextStyle(
-                                    color: Colors.tealAccent,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      // ================= SUBJECT LIST =================
-                      children: subjects.map((s) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 12,
-                          ),
-
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.03),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.04),
-                            ),
-                          ),
-
-                          child: Row(
-                            children: [
-                              // SUBJECT INFO
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      s.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-
-                                    const SizedBox(height: 4),
-
-                                    Text(
-                                      "Credit ${s.credit} • Grade ${s.grade}",
-                                      style: const TextStyle(
-                                        color: Colors.white54,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // DELETE BUTTON
-                              InkWell(
-                                onTap: () async {
-                                  await vm.deleteSubject(s);
-
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      behavior: SnackBarBehavior.floating,
-                                      backgroundColor: Colors.redAccent,
-                                      content: Text("${s.name} deleted"),
-                                    ),
-                                  );
-                                },
-
-                                borderRadius: BorderRadius.circular(10),
-
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red.withOpacity(0.08),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Icon(
-                                    Icons.delete_outline,
-                                    color: Colors.redAccent,
-                                    size: 18,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-    );
-  }
-
-  Widget _chip(String text, Color textColor, Color bg) {
+  // ================= CHIP =================
+  Widget _chip(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: bg,
+        color: Colors.white.withOpacity(0.06),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: Text(
         text,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+        style: const TextStyle(color: Colors.tealAccent, fontSize: 12),
+      ),
+    );
+  }
+
+  // ================= EMPTY STATE =================
+  Widget _emptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.school_outlined, size: 70, color: Colors.white54),
+          SizedBox(height: 10),
+          Text(
+            "No Semester Data",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          SizedBox(height: 6),
+          Text(
+            "Start by adding your first subject",
+            style: TextStyle(color: Colors.white54),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // subject update
+  /*void _showEditSemesterDialog(
+      BuildContext context,
+      GradeViewModel vm,
+      int sem,
+      List subjects,
+      ) {
+    final nameController = TextEditingController();
+    final creditController = TextEditingController();
+    final gradeController = TextEditingController();
+
+    if (subjects.isNotEmpty) {
+      nameController.text = subjects.first.name;
+      creditController.text = subjects.first.credit.toString();
+      gradeController.text = subjects.first.grade;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF132A4A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              const Text(
+                "Edit Semester Data",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              _inputField("Subject Name", nameController),
+              const SizedBox(height: 10),
+              _inputField("Credit Hours", creditController, isNumber: true),
+              const SizedBox(height: 10),
+              _inputField("Grade (A/B/C)", gradeController),
+
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF14B8A6),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  onPressed: () async {
+                    // SIMPLE APPROACH:
+                    // delete + re-add updated (clean MVVM approach can improve later)
+
+                    final updatedSubject = subjects.first;
+
+                    updatedSubject.name = nameController.text;
+                    updatedSubject.credit = int.tryParse(creditController.text) ?? 0;
+                    updatedSubject.grade = gradeController.text;
+
+                    await vm.updateSubject(updatedSubject);
+
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Save Changes",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  // sub update
+  Widget _inputField(
+      String hint,
+      TextEditingController controller, {
+        bool isNumber = false,
+      }) {
+    return TextField(
+      controller: controller,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.05),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
+    );
+  }*/
+
+  void _showEditSubjectDialog(
+      BuildContext context,
+      GradeViewModel vm,
+      SubjectModel subject,
+      ) {
+    final nameCtrl = TextEditingController(text: subject.name);
+    final creditCtrl = TextEditingController(text: subject.credit.toString());
+    final gradeCtrl = TextEditingController(text: subject.grade);
+    final semCtrl = TextEditingController(text: subject.semester.toString());
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF132A4A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              const Text(
+                "Edit Subject",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              _field("Subject Name", nameCtrl),
+              const SizedBox(height: 10),
+              _field("Credit Hours", creditCtrl, number: true),
+              const SizedBox(height: 10),
+              _field("Grade (A/B/C)", gradeCtrl),
+              const SizedBox(height: 10),
+              _field("Semester", semCtrl, number: true),
+
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF14B8A6),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  onPressed: () async {
+
+                    subject.name = nameCtrl.text;
+                    subject.credit = int.tryParse(creditCtrl.text) ?? subject.credit;
+                    subject.grade = gradeCtrl.text;
+                    subject.semester = int.tryParse(semCtrl.text) ?? subject.semester;
+
+                    await subject.save(); // ✅ Hive update
+
+                    vm.notifyListeners();
+
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Save Changes",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _field(
+      String hint,
+      TextEditingController controller, {
+        bool number = false,
+      }) {
+    return TextField(
+      controller: controller,
+      keyboardType: number ? TextInputType.number : TextInputType.text,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.05),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  // sem update
+  void _showEditSemesterDialog(
+      BuildContext context,
+      GradeViewModel vm,
+      int sem,
+      ) {
+    final controller = TextEditingController(text: sem.toString());
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF132A4A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              // TITLE
+              const Text(
+                "Edit Semester",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // INPUT
+              TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: "Semester Number",
+                  hintStyle: const TextStyle(color: Colors.white54),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.05),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // SAVE BUTTON
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF14B8A6),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () async {
+                    final newSem = int.tryParse(controller.text);
+
+                    if (newSem == null || newSem <= 0) return;
+
+                    await vm.updateSemester(sem, newSem);
+
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Save Changes",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

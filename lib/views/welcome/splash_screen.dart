@@ -1,7 +1,7 @@
-
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'onboarding_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/storage/app_prefs.dart';
+import '../../viewmodel/auth_flow_viewmodel.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,20 +15,27 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    initApp();
+  }
 
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const OnboardingScreen(),
-        ),
-      );
-    });
+  Future<void> initApp() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final appPrefs = AppPrefs(prefs);
+    final authVM = AuthFlowViewModel(appPrefs);
+
+    // Splash delay (UX only)
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    final route = authVM.getNextRoute();
+
+    Navigator.pushReplacementNamed(context, route);
   }
 
   @override
   Widget build(BuildContext context) {
-
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -39,7 +46,6 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
 
-            // APP ICON
             Container(
               height: size.width * 0.28,
               width: size.width * 0.28,
@@ -56,7 +62,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
             const SizedBox(height: 25),
 
-            // APP NAME
             const Text(
               "GradeFlow",
               style: TextStyle(
