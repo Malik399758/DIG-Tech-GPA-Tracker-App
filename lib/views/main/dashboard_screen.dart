@@ -3,6 +3,7 @@ import 'package:grade_flow/views/gpa/add_subject_screen.dart';
 import 'package:grade_flow/views/gpa/analysis_screen.dart';
 import 'package:grade_flow/views/gpa/transcript_screen.dart';
 import 'package:grade_flow/views/main/semester_add_screen.dart';
+import 'package:grade_flow/views/main/setting_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../cons/routes/app_route.dart';
@@ -42,13 +43,25 @@ class DashboardScreen extends StatelessWidget {
             children: [
 
               // ================= HEADER =================
-              const Text(
-                "Dashboard",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Dashboard",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  IconButton(onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                    SettingsScreen()));
+                  }, icon: Icon(Icons.settings))
+
+
+
+                ],
               ),
 
               const SizedBox(height: 6),

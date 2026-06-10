@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grade_flow/core/providers/profile_provider.dart';
 import 'package:grade_flow/viewmodel/grades/grade_view_model.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -25,15 +26,17 @@ void main() async {
   // SHARED PREFS INIT (FIX)
   // =======================
   final prefs = await SharedPreferences.getInstance();
+  final appPrefs = AppPrefs(prefs);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => GradeViewModel()),
-
+        ChangeNotifierProvider(create: (_) => ProfileProvider(appPrefs)),
         Provider<AppPrefs>(
-          create: (_) => AppPrefs(prefs), // ✅ NOW WORKS
+          create: (_) => AppPrefs(prefs),
         ),
+
       ],
       child: const GradeFlowApp(),
     ),
