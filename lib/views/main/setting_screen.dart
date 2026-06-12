@@ -44,7 +44,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prefs = context.watch<AppPrefs>();
+    final profile = context.watch<ProfileProvider>();
 
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
@@ -84,7 +84,7 @@ class SettingsScreen extends StatelessWidget {
                     children: [
 
                       Text(
-                        prefs.getName(),
+                        profile.name,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -95,7 +95,7 @@ class SettingsScreen extends StatelessWidget {
                       const SizedBox(height: 4),
 
                       Text(
-                        prefs.getUniversity(),
+                        profile.university,
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
@@ -282,11 +282,94 @@ class SettingsScreen extends StatelessWidget {
                     backgroundColor: const Color(0xFF14B8A6),
                   ),
                   onPressed: () async {
+                    // 1. SHOW LOADING DIALOG
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF14B8A6),
+                        ),
+                      ),
+                    );
+
+                    // 2. FAKE / REAL PROCESSING DELAY (2 sec UX effect)
+                    await Future.delayed(const Duration(seconds: 2));
+
+                    // 3. SAVE PROFILE
                     await provider.updateProfile(
                       nameCtrl.text.trim(),
                       uniCtrl.text.trim(),
                     );
 
+                    // 4. CLOSE LOADER
+                    Navigator.pop(context);
+
+                    // 5. SHOW SUCCESS SNACKBAR
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        duration: const Duration(seconds: 3),
+                        margin: const EdgeInsets.only(
+                          bottom: 0,
+                          left: 16,
+                          right: 16,
+                          top: 20,
+                        ),
+                        content: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0F172A),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFF14B8A6),
+                                width: 1,
+                              ),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.check_circle,
+                                  color: Color(0xFF14B8A6),
+                                  size: 22,
+                                ),
+                                SizedBox(width: 10),
+
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "Profile Updated",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 2),
+                                      Text(
+                                        "Changes saved successfully",
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+
+                    // 6. CLOSE SCREEN
                     Navigator.pop(context);
                   },
                   child: const Text("Save"),

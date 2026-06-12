@@ -15,28 +15,25 @@ import 'model/subject_model.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // =======================
-  // HIVE INIT
-  // =======================
+  // ================= HIVE =================
   await Hive.initFlutter();
   Hive.registerAdapter(SubjectModelAdapter());
   await Hive.openBox<SubjectModel>(HiveBoxes.subjectBox);
 
-  // =======================
-  // SHARED PREFS INIT (FIX)
-  // =======================
-  final prefs = await SharedPreferences.getInstance();
-  final appPrefs = AppPrefs(prefs);
+  // ================= PREFS =================
+  final sharedPrefs = await SharedPreferences.getInstance();
+  final appPrefs = AppPrefs(sharedPrefs);
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => GradeViewModel()),
-        ChangeNotifierProvider(create: (_) => ProfileProvider(appPrefs)),
-        Provider<AppPrefs>(
-          create: (_) => AppPrefs(prefs),
+        ChangeNotifierProvider(
+          create: (_) => GradeViewModel(),
         ),
 
+        ChangeNotifierProvider(
+          create: (_) => ProfileProvider(appPrefs)..loadProfile(),
+        ),
       ],
       child: const GradeFlowApp(),
     ),

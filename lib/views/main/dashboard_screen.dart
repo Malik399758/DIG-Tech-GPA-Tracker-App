@@ -7,6 +7,7 @@ import 'package:grade_flow/views/main/setting_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../cons/routes/app_route.dart';
+import '../../core/providers/profile_provider.dart';
 import '../../core/storage/app_prefs.dart';
 import '../../viewmodel/grades/grade_view_model.dart';
 
@@ -16,7 +17,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<GradeViewModel>(context);
-    final appPrefs = context.watch<AppPrefs>();
+    final profile = context.watch<ProfileProvider>();
 
     if (vm.subjects.isEmpty) {
       return EmptyDashboardScreen(
@@ -77,7 +78,7 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // ================= PROFILE CARD =================
-              _profileCard(appPrefs),
+              _profileCard(profile),
 
               const SizedBox(height: 16),
 
@@ -190,7 +191,7 @@ class DashboardScreen extends StatelessWidget {
   // =========================================================
   // PROFILE CARD
   // =========================================================
-  Widget _profileCard(AppPrefs prefs) {
+  Widget _profileCard(ProfileProvider profile) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -213,7 +214,7 @@ class DashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  prefs.getName(),
+                  profile.name,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -222,7 +223,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  prefs.getUniversity(),
+                  profile.university,
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
