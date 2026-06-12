@@ -292,7 +292,7 @@ class GradeViewModel extends ChangeNotifier {
     }
   }*/
 
-  double _gradePoint(String grade) {
+  double gradePoint(String grade) {
     switch (grade) {
       case "A":
         return _scale;
@@ -321,7 +321,7 @@ class GradeViewModel extends ChangeNotifier {
     int totalCredits = 0;
 
     for (var s in subjects) {
-      totalPoints += s.credit * _gradePoint(s.grade);
+      totalPoints += s.credit * gradePoint(s.grade);
       totalCredits += s.credit;
     }
 
@@ -338,7 +338,7 @@ class GradeViewModel extends ChangeNotifier {
     int totalCredits = 0;
 
     for (var s in list) {
-      totalPoints += s.credit * _gradePoint(s.grade);
+      totalPoints += s.credit * gradePoint(s.grade);
       totalCredits += s.credit;
     }
 

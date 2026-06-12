@@ -108,13 +108,69 @@ class AcademicSettingsScreen extends StatelessWidget {
         await vm.setGpaScale(value);
 
         Navigator.pop(context);
-
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("GPA Scale Updated"),
-            backgroundColor: Colors.teal,
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            duration: const Duration(seconds: 3),
+            margin: const EdgeInsets.only(
+              bottom: 0,
+              left: 16,
+              right: 16,
+              top: 20,
+            ),
+            content: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F172A),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFF14B8A6),
+                    width: 1,
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      color: Color(0xFF14B8A6),
+                      size: 22,
+                    ),
+                    SizedBox(width: 10),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "GPA Scale Updated",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            "GPA scale successfully updated",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
+
       },
     );
   }

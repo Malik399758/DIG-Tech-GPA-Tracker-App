@@ -9,6 +9,7 @@ class FullTranscriptPdf {
   static Future<Uint8List> generate({
     required List<SubjectModel> subjects,
     required double cgpa,
+    required double scale
   }) async {
 
     final pdf = pw.Document();
