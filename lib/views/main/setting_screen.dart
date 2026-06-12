@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../cons/widgets/text_field_widget.dart';
 import '../../core/providers/profile_provider.dart';
 import '../../core/storage/app_prefs.dart';
+import 'academic_setting_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -134,7 +135,14 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.school_outlined,
             title: "Academic Settings",
             subtitle: "Manage grading system",
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AcademicSettingsScreen(),
+                ),
+              );
+            },
           ),
 
           const SizedBox(height: 20),

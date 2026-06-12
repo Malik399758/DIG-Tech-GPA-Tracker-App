@@ -48,4 +48,15 @@ class AppPrefs {
   Future<void> clearAll() async {
     await prefs.clear();
   }
+
+  /// GPA Scale
+  static const String gpaScaleKey = "gpaScale";
+
+  double getGpaScale() {
+    return prefs.getDouble(gpaScaleKey) ?? 4.0;
+  }
+
+  Future<void> setGpaScale(double value) async {
+    await prefs.setDouble(gpaScaleKey, value);
+  }
 }

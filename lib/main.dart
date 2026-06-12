@@ -28,12 +28,13 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => GradeViewModel(),
+          create: (_) => GradeViewModel(appPrefs),
         ),
 
         ChangeNotifierProvider(
           create: (_) => ProfileProvider(appPrefs)..loadProfile(),
         ),
+
       ],
       child: const GradeFlowApp(),
     ),

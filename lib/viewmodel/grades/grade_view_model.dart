@@ -168,10 +168,12 @@ class GradeViewModel extends ChangeNotifier {
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
+import '../../core/storage/app_prefs.dart';
 import '../../data/hive_boxes.dart';
 import '../../model/subject_model.dart';
 
 class GradeViewModel extends ChangeNotifier {
+  final AppPrefs prefs;
   final Box<SubjectModel> _box =
   Hive.box<SubjectModel>(HiveBoxes.subjectBox);
 
@@ -271,7 +273,7 @@ class GradeViewModel extends ChangeNotifier {
   // =====================
   // GRADE POINT
   // =====================
-  double _gradePoint(String grade) {
+ /* double _gradePoint(String grade) {
     switch (grade) {
       case "A":
         return 4.0;
@@ -288,7 +290,28 @@ class GradeViewModel extends ChangeNotifier {
       default:
         return 0.0;
     }
+  }*/
+
+  double _gradePoint(String grade) {
+    switch (grade) {
+      case "A":
+        return _scale;
+      case "A-":
+        return _scale - 0.3;
+      case "B+":
+        return _scale - 0.7;
+      case "B":
+        return _scale - 1.0;
+      case "C":
+        return _scale - 1.7;
+      case "D":
+        return _scale - 2.0;
+      default:
+        return 0.0;
+    }
   }
+
+
 
   // =====================
   // CGPA
@@ -373,6 +396,19 @@ class GradeViewModel extends ChangeNotifier {
       }
     }
 
+    notifyListeners();
+  }
+
+  /// GPA Scale
+  double _scale = 4.0;
+  double get scale => _scale;
+  GradeViewModel(this.prefs) {
+    _scale = prefs.getGpaScale();
+  }
+
+  Future<void> setGpaScale(double value) async {
+    _scale = value;
+    await prefs.setGpaScale(value);
     notifyListeners();
   }
 }
