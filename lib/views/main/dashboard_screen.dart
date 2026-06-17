@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 
 import '../../cons/routes/app_route.dart';
 import '../../core/providers/profile_provider.dart';
-import '../../core/storage/app_prefs.dart';
 import '../../viewmodel/grades/grade_view_model.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -58,7 +57,7 @@ class DashboardScreen extends StatelessWidget {
                   IconButton(onPressed: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context) =>
                     SettingsScreen()));
-                  }, icon: Icon(Icons.settings))
+                  }, icon: Icon(Icons.settings,color: Colors.white,))
 
 
 
@@ -393,7 +392,7 @@ class DashboardScreen extends StatelessWidget {
 
 
 
-  Widget _emptyDashboard(BuildContext context) {
+  /*Widget _emptyDashboard(BuildContext context) {
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -501,7 +500,7 @@ class DashboardScreen extends StatelessWidget {
         ),
       ),
     );
-  }
+  }*/
 }
 
 

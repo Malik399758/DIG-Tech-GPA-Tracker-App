@@ -1,15 +1,20 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:grade_flow/cons/theme/app_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../cons/widgets/text_field_widget.dart';
 import '../../core/providers/profile_provider.dart';
-import '../../core/storage/app_prefs.dart';
+import '../../viewmodel/grades/grade_view_model.dart';
+import '../privacy/privacy_policy_screen.dart';
+import '../privacy/terms_conditions_screen.dart';
 import 'academic_setting_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  // ================= RESET DIALOG =================
   void _showResetDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -26,21 +31,74 @@ class SettingsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: Text("Cancel",style: AppFonts.poppins(
+                color: Colors.white
+            ),),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-            ),
-            onPressed: () {
-              // TODO: call clear Hive data
-              Navigator.pop(context);
-            },
-            child: const Text("Reset"),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              onPressed: () async {
+              final vm = context.read<GradeViewModel>();
+
+              await vm.clearAllData(); // 👈 FULL RESET
+
+               Navigator.pop(context);
+
+                 ScaffoldMessenger.of(context).showSnackBar(
+                   const SnackBar(content: Text("All data deleted successfully")),
+                  );
+             },
+            child: Text("Reset",style: AppFonts.poppins(
+              color: Colors.white
+            ),),
           ),
         ],
       ),
     );
+  }
+
+  // ================= EXIT APP =================
+  void _exitApp(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF132A4A),
+        title: const Text(
+          "Exit App",
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          "Do you want to close the app?",
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel",style: AppFonts.poppins(
+                color: Colors.white
+            ),),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.pop(context);
+
+              Future.delayed(const Duration(milliseconds: 200), () {
+                SystemNavigator.pop();
+              });
+            },
+            child: Text("Exit",style: AppFonts.poppins(
+              color: Colors.white
+            ),),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================= OPEN URL (PLACEHOLDER) =================
+  void _openUrl(String url) {
+    debugPrint("Open URL: $url");
   }
 
   @override
@@ -50,16 +108,22 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
 
+      // ================= APP BAR =================
       appBar: AppBar(
-        title: const Text("Settings"),
+        title: Text(
+          "Settings",
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
         backgroundColor: const Color(0xFF0B1F3A),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
 
+      // ================= BODY =================
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
 
-          // ================= PROFILE CARD =================
+          // ================= PROFILE =================
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -70,20 +134,17 @@ class SettingsScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-
                 const CircleAvatar(
                   radius: 26,
                   backgroundColor: Color(0xFF14B8A6),
                   child: Icon(Icons.person, color: Colors.white),
                 ),
-
                 const SizedBox(width: 12),
 
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Text(
                         profile.name,
                         style: const TextStyle(
@@ -92,9 +153,7 @@ class SettingsScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 4),
-
                       Text(
                         profile.university,
                         style: const TextStyle(
@@ -147,27 +206,6 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // ================= APPEARANCE =================
-          const Text(
-            "Appearance",
-            style: TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          _tile(
-            icon: Icons.color_lens_outlined,
-            title: "Theme",
-            subtitle: "Dark mode (default)",
-            onTap: () {},
-          ),
-
-          const SizedBox(height: 20),
-
-          // ================= DATA =================
           const Text(
             "Data",
             style: TextStyle(
@@ -179,13 +217,6 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 10),
 
           _tile(
-            icon: Icons.backup_outlined,
-            title: "Backup Data",
-            subtitle: "Save your progress",
-            onTap: () {},
-          ),
-
-          _tile(
             icon: Icons.delete_forever,
             title: "Reset App",
             subtitle: "Delete all records",
@@ -193,14 +224,55 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => _showResetDialog(context),
           ),
 
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
 
-          // ================= FOOTER =================
-          const Center(
-            child: Text(
-              "GradeFlow v1.0",
-              style: TextStyle(color: Colors.white38, fontSize: 12),
+          const Text(
+            "Legal",
+            style: TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.w600,
             ),
+          ),
+
+          const SizedBox(height: 10),
+
+          _tile(
+            icon: Icons.privacy_tip_outlined,
+            title: "Privacy Policy",
+            subtitle: "Read how your data is used",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PrivacyPolicyScreen(),
+                ),
+              );
+            },
+          ),
+
+          _tile(
+            icon: Icons.description_outlined,
+            title: "Terms & Conditions",
+            subtitle: "App usage rules",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const TermsConditionsScreen(),
+                ),
+              );
+            },
+          ),
+
+
+          const SizedBox(height: 20),
+
+          _tile(
+            icon: Icons.exit_to_app,
+            title: "Exit App",
+            subtitle: "Close GradeFlow",
+            iconColor: Colors.redAccent,
+            onTap: () => _exitApp(context),
           ),
         ],
       ),
@@ -245,8 +317,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // profile bottom sheet
-
   void showEditProfile(BuildContext context) {
     final provider = context.read<ProfileProvider>();
 
@@ -277,7 +347,7 @@ class SettingsScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              TextFieldWidget(controller: nameCtrl, hint: 'name'),
+              TextFieldWidget(controller: nameCtrl, hint: 'Name'),
               const SizedBox(height: 10),
               TextFieldWidget(controller: uniCtrl, hint: 'University'),
 
@@ -290,7 +360,7 @@ class SettingsScreen extends StatelessWidget {
                     backgroundColor: const Color(0xFF14B8A6),
                   ),
                   onPressed: () async {
-                    // 1. SHOW LOADING DIALOG
+                    // ================= 1. SHOW LOADING =================
                     showDialog(
                       context: context,
                       barrierDismissible: false,
@@ -301,19 +371,22 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     );
 
-                    // 2. FAKE / REAL PROCESSING DELAY (2 sec UX effect)
+                    // ================= 2. FAKE DELAY (UX SMOOTHNESS) =================
                     await Future.delayed(const Duration(seconds: 2));
 
-                    // 3. SAVE PROFILE
+                    // ================= 3. SAVE DATA =================
                     await provider.updateProfile(
                       nameCtrl.text.trim(),
                       uniCtrl.text.trim(),
                     );
 
-                    // 4. CLOSE LOADER
+                    // ================= 4. CLOSE LOADING =================
                     Navigator.pop(context);
 
-                    // 5. SHOW SUCCESS SNACKBAR
+                    // ================= 5. CLOSE BOTTOM SHEET =================
+                    Navigator.pop(context);
+
+                    // ================= 6. SHOW SUCCESS SNACKBAR =================
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         behavior: SnackBarBehavior.floating,
@@ -376,11 +449,10 @@ class SettingsScreen extends StatelessWidget {
                         ),
                       ),
                     );
-
-                    // 6. CLOSE SCREEN
-                    Navigator.pop(context);
                   },
-                  child: const Text("Save"),
+                  child: Text("Save",style: AppFonts.poppins(
+                    color: Colors.white,
+                  ),),
                 ),
               ),
             ],

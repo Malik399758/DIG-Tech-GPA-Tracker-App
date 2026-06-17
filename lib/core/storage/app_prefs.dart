@@ -2,8 +2,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPrefs {
   final SharedPreferences prefs;
+  static const themeKey = "themeKey";
 
   AppPrefs(this.prefs);
+
+  // =============== APP Theme ============
+
+  String getThemeMode() {
+    return prefs.getString(themeKey) ?? "dark";
+  }
+
+  Future<void> setThemeMode(String value) async {
+    await prefs.setString(themeKey, value);
+  }
 
   // ================= KEYS =================
   static const onboardingDone = "onboardingDone";
@@ -59,4 +70,5 @@ class AppPrefs {
   Future<void> setGpaScale(double value) async {
     await prefs.setDouble(gpaScaleKey, value);
   }
+
 }

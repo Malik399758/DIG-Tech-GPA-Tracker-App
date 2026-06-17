@@ -515,7 +515,7 @@ class _SemesterDetailScreenState extends State<SemesterDetailScreen>
                     subject.grade = gradeCtrl.text;
                     subject.semester = int.tryParse(semCtrl.text) ?? subject.semester;
 
-                    await subject.save(); // ✅ Hive update
+                    await subject.save();
 
                     vm.notifyListeners();
 

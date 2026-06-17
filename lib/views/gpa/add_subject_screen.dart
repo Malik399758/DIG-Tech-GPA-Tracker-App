@@ -24,7 +24,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   Widget build(BuildContext context) {
 
     final vm = Provider.of<GradeViewModel>(context);
-    final grouped = vm.groupedBySemester;
+    // final grouped = vm.groupedBySemester;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),

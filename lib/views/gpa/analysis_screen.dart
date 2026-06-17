@@ -112,7 +112,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
           const SizedBox(height: 18),
 
           // ================= GRAPH =================
-          _graphCard(data),
+          _graphCard(data,vm.scale),
 
           const SizedBox(height: 20),
 
@@ -129,7 +129,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
   }
 
   // ================= GRAPH =================
-  Widget _graphCard(Map<int, double> data) {
+  Widget _graphCard(Map<int, double> data,double scale) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -147,7 +147,7 @@ class _AnalysisScreenState extends State<AnalysisScreen>
         child: LineChart(
           LineChartData(
             minY: 0,
-            maxY: 4,
+            maxY: scale,
 
             gridData: const FlGridData(show: false),
             borderData: FlBorderData(show: false),

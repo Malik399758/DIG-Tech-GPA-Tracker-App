@@ -404,7 +404,7 @@ class TranscriptScreen extends StatelessWidget {
               final pdf = await FullTranscriptPdf.generate(
                 subjects: vm.subjects,
                 cgpa: vm.cgpa,
-                scale: vm.scale, // IMPORTANT FIX
+                scale: vm.scale,
               );
 
               await Printing.layoutPdf(

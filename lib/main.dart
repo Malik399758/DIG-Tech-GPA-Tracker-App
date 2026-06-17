@@ -34,7 +34,6 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => ProfileProvider(appPrefs)..loadProfile(),
         ),
-
       ],
       child: const GradeFlowApp(),
     ),
@@ -54,26 +53,31 @@ class GradeFlowApp extends StatelessWidget {
 
       theme: ThemeData(
         useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFF0B1F3A),
+          centerTitle: true,
+
+          titleTextStyle: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+
+          iconTheme: IconThemeData(
+            color: Colors.white, // back arrow + icons
+          ),
+        ),
+
+        scaffoldBackgroundColor: Colors.white,
+        cardColor: Colors.grey.shade100,
+
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF1E3A8A),
           secondary: Color(0xFF14B8A6),
         ),
+
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
-
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF1E3A8A),
-          secondary: Color(0xFF14B8A6),
-        ),
-        textTheme: GoogleFonts.poppinsTextTheme(
-          ThemeData.dark().textTheme,
-        ),
-      ),
-
-      themeMode: ThemeMode.system,
     );
   }
 }

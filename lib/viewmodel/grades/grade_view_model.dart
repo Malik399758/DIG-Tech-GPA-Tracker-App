@@ -1,170 +1,3 @@
-/*
-
-
-import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-
-import '../../data/hive_boxes.dart';
-import '../../model/subject_model.dart';
-
-class GradeViewModel extends ChangeNotifier {
-  late final Box<SubjectModel> _box =
-  Hive.box<SubjectModel>(HiveBoxes.subjectBox);
-
-  // =====================
-  // SUBJECT LIST
-  // =====================
-  List<SubjectModel> get subjects => _box.values.toList();
-
-  // =====================
-  // GROUP BY SEMESTER
-  // =====================
-  Map<int, List<SubjectModel>> get groupedBySemester {
-    Map<int, List<SubjectModel>> data = {};
-
-    for (var s in subjects) {
-      data.putIfAbsent(s.semester, () => []);
-      data[s.semester]!.add(s);
-    }
-
-    return data;
-  }
-
-  // =====================
-  // CURRENT SEMESTER
-  // =====================
-  int get currentSemester {
-    if (subjects.isEmpty) return 1;
-
-    return subjects
-        .map((s) => s.semester)
-        .reduce((a, b) => a > b ? a : b);
-  }
-
-  // =====================
-  // ALL SEMESTERS
-  // =====================
-  List<int> get allSemesters {
-    return subjects.map((s) => s.semester).toSet().toList()..sort();
-  }
-
-  // =====================
-  // FILTER BY SEMESTER
-  // =====================
-  List<SubjectModel> subjectsBySemester(int sem) {
-    return subjects.where((s) => s.semester == sem).toList();
-  }
-
-  // =====================
-  // ADD SUBJECT
-  // =====================
-  void addSubject(String name, int credit, String grade, int semester) {
-    final subject = SubjectModel(
-      name: name,
-      credit: credit,
-      grade: grade,
-      semester: semester,
-    );
-
-    _box.add(subject);
-    notifyListeners();
-  }
-
-  // =====================
-  // DELETE SUBJECT (FIXED)
-  // =====================
-  void deleteSubject(SubjectModel subject) {
-    final key = _box.keyAt(_box.values.toList().indexOf(subject));
-    _box.delete(key);
-    notifyListeners();
-  }
-
-  // =====================
-  // GRADE POINT
-  // =====================
-  double _gradePoint(String grade) {
-    switch (grade) {
-      case "A":
-        return 4.0;
-      case "A-":
-        return 3.7;
-      case "B+":
-        return 3.3;
-      case "B":
-        return 3.0;
-      case "C":
-        return 2.3;
-      case "D":
-        return 2.0;
-      default:
-        return 0.0;
-    }
-  }
-
-  // =====================
-  // CGPA
-  // =====================
-  double get cgpa {
-    double totalPoints = 0;
-    int totalCredits = 0;
-
-    for (var s in subjects) {
-      totalPoints += s.credit * _gradePoint(s.grade);
-      totalCredits += s.credit;
-    }
-
-    return totalCredits == 0 ? 0.0 : totalPoints / totalCredits;
-  }
-
-  // =====================
-  // SGPA PER SEMESTER
-  // =====================
-  double sgpaBySemester(int sem) {
-    double totalPoints = 0;
-    int totalCredits = 0;
-
-    for (var s in subjects.where((s) => s.semester == sem)) {
-      totalPoints += s.credit * _gradePoint(s.grade);
-      totalCredits += s.credit;
-    }
-
-    return totalCredits == 0 ? 0.0 : totalPoints / totalCredits;
-  }
-
-  String getPerformance(double sgpa) {
-    if (sgpa >= 3.7) return "Excellent 🔥";
-    if (sgpa >= 3.0) return "Good 👍";
-    if (sgpa >= 2.0) return "Average ⚠️";
-    return "Poor ❌";
-  }
-
-  List<Map<String, dynamic>> semesterAnalysis() {
-    return groupedBySemester.entries.map((entry) {
-
-      final sem = entry.key;
-      final sgpa = sgpaBySemester(sem);
-
-      return {
-        "semester": sem,
-        "sgpa": sgpa,
-        "performance": getPerformance(sgpa),
-      };
-    }).toList();
-  }
-
-  // GPA Analysis
-  Map<int, double> get semesterGPAChart {
-    Map<int, double> data = {};
-
-    for (var sem in allSemesters) {
-      data[sem] = sgpaBySemester(sem);
-    }
-
-    return data;
-  }
-}*/
-
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
@@ -174,124 +7,87 @@ import '../../model/subject_model.dart';
 
 class GradeViewModel extends ChangeNotifier {
   final AppPrefs prefs;
+
   final Box<SubjectModel> _box =
   Hive.box<SubjectModel>(HiveBoxes.subjectBox);
 
-  // =====================
-  // CACHE (IMPORTANT OPTIMIZATION)
-  // =====================
-  List<SubjectModel>? _cachedSubjects;
-
-  List<SubjectModel> get subjects {
-    _cachedSubjects = _box.values.toList();
-    return _cachedSubjects!;
+  GradeViewModel(this.prefs) {
+    _scale = prefs.getGpaScale();
   }
 
-  void _refresh() {
-    _cachedSubjects = null;
+  // ================= SCALE =================
+  double _scale = 4.0;
+  double get scale => _scale;
+
+  Future<void> setGpaScale(double value) async {
+    _scale = value;
+    await prefs.setGpaScale(value);
     notifyListeners();
   }
 
-  // =====================
-  // GROUP BY SEMESTER (OPTIMIZED)
-  // =====================
+  // ================= SUBJECTS =================
+  List<SubjectModel> get subjects => _box.values.toList();
+
   Map<int, List<SubjectModel>> get groupedBySemester {
     final Map<int, List<SubjectModel>> data = {};
-
     for (var s in subjects) {
       (data[s.semester] ??= []).add(s);
     }
-
     return data;
   }
 
-  // =====================
-  // CURRENT SEMESTER
-  // =====================
-  int get currentSemester {
-    if (subjects.isEmpty) return 1;
-
-    return subjects
-        .map((s) => s.semester)
-        .reduce((a, b) => a > b ? a : b);
-  }
-
-  // =====================
-  // ALL SEMESTERS
-  // =====================
   List<int> get allSemesters {
-    final set = subjects.map((e) => e.semester).toSet().toList();
-    set.sort();
-    return set;
+    final list = subjects.map((e) => e.semester).toSet().toList();
+    list.sort();
+    return list;
   }
 
-  // =====================
-  // FILTER BY SEMESTER
-  // =====================
   List<SubjectModel> subjectsBySemester(int sem) {
     return subjects.where((s) => s.semester == sem).toList();
   }
 
-  // =====================
-  // ADD SUBJECT
-  // =====================
+  // ================= CURRENT SEMESTER =================
+  int get currentSemester {
+    if (subjects.isEmpty) return 1;
+    return subjects.map((s) => s.semester).reduce((a, b) => a > b ? a : b);
+  }
+
+  // ================= ADD SUBJECT =================
   void addSubject(String name, int credit, String grade, int semester) {
-    final subject = SubjectModel(
+    _box.add(SubjectModel(
       name: name,
       credit: credit,
       grade: grade,
       semester: semester,
-    );
-
-    _box.add(subject);
-    _refresh();
+    ));
+    notifyListeners();
   }
 
-  // =====================
-  // DELETE SUBJECT (FIXED + SAFE)
-  // =====================
+  // ================= DELETE SINGLE =================
   Future<void> deleteSubject(SubjectModel subject) async {
-    final key = subject.key; // Hive object key (BEST WAY)
-
-    await _box.delete(key);
+    await subject.delete();
     notifyListeners();
   }
 
-  /// Delete Entire function
+  // ================= DELETE SEMESTER =================
   Future<void> deleteSemester(int semester) async {
-    final subjectsToDelete = _box.values
-        .where((s) => s.semester == semester)
-        .toList();
+    final items =
+    _box.values.where((s) => s.semester == semester).toList();
 
-    for (final subject in subjectsToDelete) {
-      await subject.delete();
+    for (final item in items) {
+      await item.delete();
     }
 
     notifyListeners();
   }
 
-  // =====================
-  // GRADE POINT
-  // =====================
- /* double _gradePoint(String grade) {
-    switch (grade) {
-      case "A":
-        return 4.0;
-      case "A-":
-        return 3.7;
-      case "B+":
-        return 3.3;
-      case "B":
-        return 3.0;
-      case "C":
-        return 2.3;
-      case "D":
-        return 2.0;
-      default:
-        return 0.0;
-    }
-  }*/
+  // ================= CLEAR ALL DATA (HIVE RESET) =================
+  Future<void> clearAllData() async {
+    await _box.clear();
+    notifyListeners();
+  }
 
+  // ================= GRADE POINT SYSTEM =================
   double gradePoint(String grade) {
     switch (grade) {
       case "A":
@@ -311,11 +107,7 @@ class GradeViewModel extends ChangeNotifier {
     }
   }
 
-
-
-  // =====================
-  // CGPA
-  // =====================
+  // ================= CGPA =================
   double get cgpa {
     double totalPoints = 0;
     int totalCredits = 0;
@@ -328,9 +120,7 @@ class GradeViewModel extends ChangeNotifier {
     return totalCredits == 0 ? 0.0 : totalPoints / totalCredits;
   }
 
-  // =====================
-  // SGPA
-  // =====================
+  // ================= SGPA =================
   double sgpaBySemester(int sem) {
     final list = subjectsBySemester(sem);
 
@@ -345,9 +135,21 @@ class GradeViewModel extends ChangeNotifier {
     return totalCredits == 0 ? 0.0 : totalPoints / totalCredits;
   }
 
-  // =====================
-  // PERFORMANCE LABEL
-  // =====================
+  /// =====================
+  /// UPDATE SEMESTER
+  /// =====================
+  Future<void> updateSemester(int oldSem, int newSem) async {
+    for (final item in _box.values) {
+      if (item.semester == oldSem) {
+        item.semester = newSem;
+        await item.save();
+      }
+    }
+
+    notifyListeners();
+  }
+
+  // ================= PERFORMANCE =================
   String getPerformance(double sgpa) {
     if (sgpa >= 3.7) return "Excellent 🔥";
     if (sgpa >= 3.0) return "Good 👍";
@@ -355,18 +157,14 @@ class GradeViewModel extends ChangeNotifier {
     return "Poor ❌";
   }
 
-  // =====================
-  // CHART DATA
-  // =====================
+  // ================= CHART DATA =================
   Map<int, double> get semesterGPAChart {
     return {
       for (var sem in allSemesters) sem: sgpaBySemester(sem),
     };
   }
 
-  // =====================
-  // ANALYSIS DATA (FOR UI)
-  // =====================
+  // ================= ANALYSIS =================
   List<Map<String, dynamic>> get semesterAnalysis {
     return groupedBySemester.entries.map((entry) {
       final sgpa = sgpaBySemester(entry.key);
@@ -377,38 +175,5 @@ class GradeViewModel extends ChangeNotifier {
         "performance": getPerformance(sgpa),
       };
     }).toList();
-  }
-
-  /// subject update
-  Future<void> updateSubject(SubjectModel subject) async {
-    await subject.save(); // Hive object already knows its box
-    notifyListeners();
-  }
-
-  /// semester update
-  Future<void> updateSemester(int oldSem, int newSem) async {
-    final box = HiveBoxes.getSubjects(); // ✅ SAFE & CORRECT
-
-    for (var item in box.values) {
-      if (item.semester == oldSem) {
-        item.semester = newSem;
-        await item.save(); // persists correctly
-      }
-    }
-
-    notifyListeners();
-  }
-
-  /// GPA Scale
-  double _scale = 4.0;
-  double get scale => _scale;
-  GradeViewModel(this.prefs) {
-    _scale = prefs.getGpaScale();
-  }
-
-  Future<void> setGpaScale(double value) async {
-    _scale = value;
-    await prefs.setGpaScale(value);
-    notifyListeners();
   }
 }
