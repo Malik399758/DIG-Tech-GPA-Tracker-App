@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:grade_flow/cons/theme/app_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../cons/widgets/text_field_widget.dart';
@@ -14,16 +13,14 @@ import 'academic_setting_screen.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  // ================= RESET DIALOG =================
+  // ================= RESET =================
   void _showResetDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF132A4A),
-        title: const Text(
-          "Reset Data",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Reset Data",
+            style: TextStyle(color: Colors.white)),
         content: const Text(
           "This will permanently delete all academic data. Continue?",
           style: TextStyle(color: Colors.white70),
@@ -31,42 +28,36 @@ class SettingsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Cancel",style: AppFonts.poppins(
-                color: Colors.white
-            ),),
+            child: const Text("Cancel",
+                style: TextStyle(color: Colors.white)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-              onPressed: () async {
+            onPressed: () async {
               final vm = context.read<GradeViewModel>();
+              await vm.clearAllData(); // implement in VM
 
-              await vm.clearAllData(); // 👈 FULL RESET
+              Navigator.pop(context);
 
-               Navigator.pop(context);
-
-                 ScaffoldMessenger.of(context).showSnackBar(
-                   const SnackBar(content: Text("All data deleted successfully")),
-                  );
-             },
-            child: Text("Reset",style: AppFonts.poppins(
-              color: Colors.white
-            ),),
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("All data deleted")),
+              );
+            },
+            child: const Text("Reset"),
           ),
         ],
       ),
     );
   }
 
-  // ================= EXIT APP =================
+  // ================= EXIT =================
   void _exitApp(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF132A4A),
-        title: const Text(
-          "Exit App",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Exit App",
+            style: TextStyle(color: Colors.white)),
         content: const Text(
           "Do you want to close the app?",
           style: TextStyle(color: Colors.white70),
@@ -74,31 +65,22 @@ class SettingsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Cancel",style: AppFonts.poppins(
-                color: Colors.white
-            ),),
+            child: const Text("Cancel",
+                style: TextStyle(color: Colors.white)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(context);
-
               Future.delayed(const Duration(milliseconds: 200), () {
                 SystemNavigator.pop();
               });
             },
-            child: Text("Exit",style: AppFonts.poppins(
-              color: Colors.white
-            ),),
+            child: const Text("Exit"),
           ),
         ],
       ),
     );
-  }
-
-  // ================= OPEN URL (PLACEHOLDER) =================
-  void _openUrl(String url) {
-    debugPrint("Open URL: $url");
   }
 
   @override
@@ -110,10 +92,8 @@ class SettingsScreen extends StatelessWidget {
 
       // ================= APP BAR =================
       appBar: AppBar(
-        title: Text(
-          "Settings",
-          style: GoogleFonts.poppins(color: Colors.white),
-        ),
+        title: Text("Settings",
+            style: GoogleFonts.poppins(color: Colors.white)),
         backgroundColor: const Color(0xFF0B1F3A),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -140,27 +120,18 @@ class SettingsScreen extends StatelessWidget {
                   child: Icon(Icons.person, color: Colors.white),
                 ),
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        profile.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text(profile.name,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
-                      Text(
-                        profile.university,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
+                      Text(profile.university,
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -171,23 +142,16 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 20),
 
           // ================= GENERAL =================
-          const Text(
-            "General",
-            style: TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
+          const Text("General",
+              style: TextStyle(
+                  color: Colors.white70, fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
 
           _tile(
             icon: Icons.person_outline,
             title: "Edit Profile",
             subtitle: "Update name & university",
-            onTap: () {
-              showEditProfile(context);
-            },
+            onTap: () => showEditProfile(context),
           ),
 
           _tile(
@@ -206,14 +170,10 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          const Text(
-            "Data",
-            style: TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
+          // ================= DATA =================
+          const Text("Data",
+              style: TextStyle(
+                  color: Colors.white70, fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
 
           _tile(
@@ -226,14 +186,10 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          const Text(
-            "Legal",
-            style: TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
+          // ================= LEGAL =================
+          const Text("Legal",
+              style: TextStyle(
+                  color: Colors.white70, fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
 
           _tile(
@@ -264,9 +220,119 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
 
+          _tile(
+            icon: Icons.info_outline,
+            title: "About App",
+            subtitle: "GradeFlow • Developer Info",
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (_) {
+                  return Dialog(
+                    backgroundColor: const Color(0xFF132A4A),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+
+                          // APP ICON
+                          const CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Color(0xFF14B8A6),
+                            child: Icon(Icons.school, color: Colors.white, size: 30),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          const Text(
+                            "GradeFlow",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          const Text(
+                            "Version 1.0.0",
+                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          const Text(
+                            "A smart GPA & CGPA tracking system for students.\nBuilt with Flutter for clean academic management.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                              height: 1.4,
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.white12),
+                            ),
+                            child: const Column(
+                              children: [
+                                Text(
+                                  "Developer",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  "Yaseen Malik",
+                                  style: TextStyle(color: Color(0xFF14B8A6)),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF14B8A6),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text(
+                                "Close",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
 
           const SizedBox(height: 20),
 
+          // ================= EXIT =================
           _tile(
             icon: Icons.exit_to_app,
             title: "Exit App",
@@ -274,12 +340,24 @@ class SettingsScreen extends StatelessWidget {
             iconColor: Colors.redAccent,
             onTap: () => _exitApp(context),
           ),
+
+          const SizedBox(height: 30),
+
+          Center(
+            child: Text(
+              "GradeFlow • Built with Flutter",
+              style: GoogleFonts.poppins(
+                color: Colors.white38,
+                fontSize: 12,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  // ================= TILE WIDGET =================
+  // ================= TILE =================
   Widget _tile({
     required IconData icon,
     required String title,
@@ -296,27 +374,19 @@ class SettingsScreen extends StatelessWidget {
       ),
       child: ListTile(
         leading: Icon(icon, color: iconColor),
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: const TextStyle(color: Colors.white54, fontSize: 12),
-        ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 14,
-          color: Colors.white38,
-        ),
+        title: Text(title,
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle,
+            style: const TextStyle(color: Colors.white54, fontSize: 12)),
+        trailing: const Icon(Icons.arrow_forward_ios,
+            size: 14, color: Colors.white38),
         onTap: onTap,
       ),
     );
   }
 
+  // ================= EDIT PROFILE =================
   void showEditProfile(BuildContext context) {
     final provider = context.read<ProfileProvider>();
 
@@ -335,21 +405,16 @@ class SettingsScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-
-              const Text(
-                "Edit Profile",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
+              const Text("Edit Profile",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
 
-              TextFieldWidget(controller: nameCtrl, hint: 'Name'),
+              TextFieldWidget(controller: nameCtrl, hint: "Name"),
               const SizedBox(height: 10),
-              TextFieldWidget(controller: uniCtrl, hint: 'University'),
+              TextFieldWidget(controller: uniCtrl, hint: "University"),
 
               const SizedBox(height: 20),
 
@@ -357,36 +422,25 @@ class SettingsScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF14B8A6),
-                  ),
+                      backgroundColor: const Color(0xFF14B8A6)),
                   onPressed: () async {
-                    // ================= 1. SHOW LOADING =================
                     showDialog(
                       context: context,
                       barrierDismissible: false,
                       builder: (_) => const Center(
                         child: CircularProgressIndicator(
-                          color: Color(0xFF14B8A6),
-                        ),
+                            color: Color(0xFF14B8A6)),
                       ),
                     );
 
-                    // ================= 2. FAKE DELAY (UX SMOOTHNESS) =================
                     await Future.delayed(const Duration(seconds: 2));
 
-                    // ================= 3. SAVE DATA =================
                     await provider.updateProfile(
-                      nameCtrl.text.trim(),
-                      uniCtrl.text.trim(),
-                    );
+                        nameCtrl.text.trim(), uniCtrl.text.trim());
 
-                    // ================= 4. CLOSE LOADING =================
+                    Navigator.pop(context);
                     Navigator.pop(context);
 
-                    // ================= 5. CLOSE BOTTOM SHEET =================
-                    Navigator.pop(context);
-
-                    // ================= 6. SHOW SUCCESS SNACKBAR =================
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         behavior: SnackBarBehavior.floating,
@@ -434,7 +488,7 @@ class SettingsScreen extends StatelessWidget {
                                       ),
                                       SizedBox(height: 2),
                                       Text(
-                                        "Changes saved successfully",
+                                        "Profile successfully saved.",
                                         style: TextStyle(
                                           color: Colors.white70,
                                           fontSize: 12,
@@ -450,11 +504,10 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Text("Save",style: AppFonts.poppins(
-                    color: Colors.white,
-                  ),),
+                  child: Text("Save",
+                      style: GoogleFonts.poppins(color: Colors.white)),
                 ),
-              ),
+              )
             ],
           ),
         );

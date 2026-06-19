@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -7,84 +7,124 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF0B1F3A),
+
       appBar: AppBar(
-        title: const Text("Privacy Policy"),
+        title: Text(
+          "Privacy Policy",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         centerTitle: true,
+        backgroundColor: const Color(0xFF0B1F3A),
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF132A4A),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.white10),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
               Text(
                 "Privacy Policy",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-              SizedBox(height: 10),
+
+              const SizedBox(height: 8),
 
               Text(
-                "Last updated: June 2026\n",
+                "Last updated: June 2026",
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: Colors.white60,
+                ),
               ),
 
-              Text(
-                "We respect your privacy and are committed to protecting any data you may share while using our application.",
+              const SizedBox(height: 20),
+
+              _sectionTitle("1. Information We Collect"),
+              _text(
+                "GradeFlow does not collect personal data unless required for core functionality like storing academic records locally on your device.",
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 15),
 
-              Text(
-                "1. Information We Collect",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "We do not collect personal information unless explicitly required for app functionality.",
+              _sectionTitle("2. How We Use Information"),
+              _text(
+                "All data is used only to calculate GPA, SGPA, and display your academic performance. Nothing is shared externally.",
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-              Text(
-                "2. How We Use Information",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "Any data collected is used only to improve app performance and user experience.",
+              _sectionTitle("3. Data Security"),
+              _text(
+                "Your data is stored locally using secure local storage (Hive). We do not upload or transmit your data to any server.",
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-              Text(
-                "3. Data Security",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "We ensure your data is stored securely and is not shared with third parties.",
+              _sectionTitle("4. Third-Party Services"),
+              _text(
+                "GradeFlow does not use third-party analytics, ads, or tracking services.",
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-              Text(
-                "4. Third-Party Services",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "This app does not use third-party tracking or advertising services.",
+              _sectionTitle("5. Contact Us"),
+              _text(
+                "If you have any questions, feel free to contact us at:\nyaseenmalik.coder@gmail.com",
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 20),
 
-              Text(
-                "5. Contact Us",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Center(
+                child: Text(
+                  "GradeFlow • Built for students",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white38,
+                    fontSize: 12,
+                  ),
+                ),
               ),
-              Text(
-                "If you have any questions, contact us at: support@example.com",
-              ),
-
-              SizedBox(height: 30),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String text) {
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: const Color(0xFF14B8A6),
+      ),
+    );
+  }
+
+  Widget _text(String text) {
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: 13,
+        color: Colors.white70,
+        height: 1.5,
       ),
     );
   }

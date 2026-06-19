@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TermsConditionsScreen extends StatelessWidget {
   const TermsConditionsScreen({super.key});
@@ -7,81 +7,123 @@ class TermsConditionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF0B1F3A),
+
       appBar: AppBar(
-        title: const Text("Terms & Conditions"),
+        title: Text(
+          "Terms & Conditions",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
         centerTitle: true,
+        backgroundColor: const Color(0xFF0B1F3A),
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF132A4A),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.white10),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
               Text(
                 "Terms & Conditions",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
 
               Text(
-                "By using this application, you agree to the following terms and conditions.",
+                "By using GradeFlow, you agree to the following terms and conditions.",
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.white70,
+                  height: 1.5,
+                ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-              Text(
-                "1. Usage of App",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "You agree to use this app only for lawful purposes and not misuse its features.",
+              _sectionTitle("1. Usage of App"),
+              _text(
+                "You agree to use GradeFlow only for educational and lawful purposes. Any misuse of the application features is strictly prohibited.",
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-              Text(
-                "2. User Responsibility",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "Users are responsible for how they use the application.",
+              _sectionTitle("2. User Responsibility"),
+              _text(
+                "You are fully responsible for any data you enter, including academic records and calculations.",
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-              Text(
-                "3. Modifications",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "We reserve the right to update or change these terms at any time.",
+              _sectionTitle("3. Modifications"),
+              _text(
+                "We reserve the right to update, modify, or improve these terms at any time without prior notice.",
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-              Text(
-                "4. Limitation of Liability",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "We are not responsible for any damages caused by the use of this app.",
+              _sectionTitle("4. Limitation of Liability"),
+              _text(
+                "GradeFlow is provided as-is. We are not responsible for any data loss or misuse of the application.",
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-              Text(
-                "5. Contact",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "For any issues, contact: support@example.com",
+              _sectionTitle("5. Contact"),
+              _text(
+                "For any questions or issues, contact us at:\nyaseenmalik.coder@gmail.com",
               ),
 
-              SizedBox(height: 30),
+              const SizedBox(height: 25),
+
+              Center(
+                child: Text(
+                  "GradeFlow • Built for students",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white38,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String text) {
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: const Color(0xFF14B8A6),
+      ),
+    );
+  }
+
+  Widget _text(String text) {
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: 13,
+        color: Colors.white70,
+        height: 1.5,
       ),
     );
   }
