@@ -17,8 +17,8 @@ class _EmptyDashboardScreenState extends State<EmptyDashboardScreen>
 
   late AnimationController _controller;
   late Animation<double> _fade;
-  late Animation<Offset> _slide;
   late Animation<double> _scale;
+  late Animation<double> _float;
 
   @override
   void initState() {
@@ -26,25 +26,20 @@ class _EmptyDashboardScreenState extends State<EmptyDashboardScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+
+    _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
 
-    _fade = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    _scale = Tween<double>(begin: 0.92, end: 1.05).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    _float = Tween<double>(begin: -8, end: 8).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
-
-    _scale = Tween<double>(begin: 0.85, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
-
-    _controller.forward();
   }
 
   @override
@@ -58,114 +53,113 @@ class _EmptyDashboardScreenState extends State<EmptyDashboardScreen>
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
 
-      body: SafeArea(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Opacity(
-              opacity: _fade.value,
-              child: Transform.translate(
-                offset: _slide.value,
-                child: Column(
-                  children: [
+      body: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Opacity(
+            opacity: _fade.value,
+            child: Column(
+              children: [
 
-                    const Spacer(),
+                const Spacer(),
 
-                    // ================= ICON =================
-                    Transform.scale(
-                      scale: _scale.value,
-                      child: Container(
-                        padding: const EdgeInsets.all(30),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFF14B8A6).withOpacity(0.25),
-                              const Color(0xFF1E3A8A).withOpacity(0.25),
-                            ],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.35),
-                              blurRadius: 30,
-                              offset: const Offset(0, 12),
-                            ),
+                // ================= FLOATING ICON =================
+                Transform.translate(
+                  offset: Offset(0, _float.value),
+                  child: Transform.scale(
+                    scale: _scale.value,
+                    child: Container(
+                      padding: const EdgeInsets.all(34),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF14B8A6),
+                            Color(0xFF1E3A8A),
                           ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        child: const Icon(
-                          Icons.school_outlined,
-                          size: 64,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    // ================= TITLE =================
-                    const Text(
-                      "Start Your Academic Journey",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ================= DESCRIPTION =================
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 28),
-                      child: const Text(
-                        "Create your academic record and track SGPA, CGPA, and performance in a smart and organized way.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // ================= BUTTON =================
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Transform.scale(
-                        scale: _scale.value,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF14B8A6),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              elevation: 8,
-                            ),
-                            onPressed: widget.onCreateSemester,
-                            child: const Text(
-                              "Get Started",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF14B8A6).withOpacity(0.25),
+                            blurRadius: 40,
+                            spreadRadius: 2,
                           ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.school_rounded,
+                        size: 64,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 28),
+
+                // ================= TITLE =================
+                const Text(
+                  "Start Your Academic Journey",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                // ================= DESCRIPTION =================
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  child: Text(
+                    "Create your first semester and track SGPA, CGPA, and academic progress in a smart and modern way.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 14,
+                      height: 1.6,
+                    ),
+                  ),
+                ),
+
+                const Spacer(),
+
+                // ================= BUTTON =================
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF14B8A6),
+                        elevation: 10,
+                        shadowColor: Colors.black45,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: widget.onCreateSemester,
+                      child: const Text(
+                        "Create First Semester",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
