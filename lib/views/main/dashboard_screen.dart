@@ -18,14 +18,16 @@ class DashboardScreen extends StatelessWidget {
     final vm = Provider.of<GradeViewModel>(context);
     final profile = context.watch<ProfileProvider>();
 
+    final size = MediaQuery.of(context).size;
+    final w = size.width;
+    final h = size.height;
+
     if (vm.subjects.isEmpty) {
       return EmptyDashboardScreen(
         onCreateSemester: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const AddSubjectScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const AddSubjectScreen()),
           );
         },
       );
@@ -35,164 +37,183 @@ class DashboardScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF0B1F3A),
 
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 650),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.all(w * 0.04),
 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              // ================= HEADER =================
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Dashboard",
+
+                  // ================= HEADER =================
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Dashboard",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: w * 0.07,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+
+                      IconButton(
+                        iconSize: w * 0.06,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SettingsScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.settings, color: Colors.white),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: h * 0.005),
+
+                  Text(
+                    "Track your academic progress",
+                    style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: w * 0.035,
+                    ),
+                  ),
+
+                  SizedBox(height: h * 0.02),
+
+                  // PROFILE
+                  _profileCard(profile, w),
+
+                  SizedBox(height: h * 0.02),
+
+                  // CGPA
+                  _cgpaCard(vm, w),
+
+                  SizedBox(height: h * 0.02),
+
+                  // STATS
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _miniCard(
+                          "SGPA",
+                          vm.sgpaBySemester(vm.currentSemester)
+                              .toStringAsFixed(2),
+                          Icons.trending_up,
+                          w,
+                        ),
+                      ),
+                      SizedBox(width: w * 0.03),
+                      Expanded(
+                        child: _miniCard(
+                          "Semesters",
+                          vm.currentSemester.toString(),
+                          Icons.school,
+                          w,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: h * 0.02),
+
+                  // QUICK ACTION TITLE
+                  Text(
+                    "Quick Actions",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
+                      fontSize: w * 0.045,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  IconButton(onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                    SettingsScreen()));
-                  }, icon: Icon(Icons.settings,color: Colors.white,))
 
+                  SizedBox(height: h * 0.015),
 
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _actionCard(
+                          icon: Icons.add,
+                          title: "Add Semester",
+                          w: w,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AddSubjectScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(width: w * 0.03),
+                      Expanded(
+                        child: _actionCard(
+                          icon: Icons.menu_book,
+                          title: "Transcript",
+                          w: w,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const TranscriptScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
 
+                  SizedBox(height: h * 0.02),
+
+                  _primaryButton(
+                    "View Semester Details",
+                    Icons.arrow_forward_ios,
+                    w,
+                        () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.semesterDetail,
+                        arguments: vm.currentSemester,
+                      );
+                    },
+                  ),
+
+                  SizedBox(height: h * 0.02),
+
+                  InsightCard(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AnalysisScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  SizedBox(height: h * 0.03),
                 ],
               ),
-
-              const SizedBox(height: 6),
-
-              Text(
-                "Track your academic progress",
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
-                  fontSize: 13,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // ================= PROFILE CARD =================
-              _profileCard(profile),
-
-              const SizedBox(height: 16),
-
-              // ================= CGPA CARD =================
-              _cgpaCard(vm),
-
-              const SizedBox(height: 16),
-
-              // ================= STATS =================
-              Row(
-                children: [
-                  Expanded(
-                    child: _miniCard(
-                      "SGPA",
-                      vm.sgpaBySemester(vm.currentSemester).toStringAsFixed(2),
-                      Icons.trending_up,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _miniCard(
-                      "Semesters",
-                      vm.currentSemester.toString(),
-                      Icons.school,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              // ================= QUICK ACTIONS =================
-              const Text(
-                "Quick Actions",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: _actionCard(
-                      icon: Icons.add,
-                      title: "Add Semester",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AddSubjectScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: _actionCard(
-                      icon: Icons.menu_book,
-                      title: "Transcript",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const TranscriptScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 14),
-
-              _primaryButton(
-                "View Semester Details",
-                Icons.arrow_forward_ios,
-                    () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.semesterDetail,
-                    arguments: vm.currentSemester,
-                  );
-                },
-              ),
-
-              const SizedBox(height: 18),
-
-              // ================= INSIGHT CARD =================
-              InsightCard(onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                    AnalysisScreen()));
-              },),
-
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // =========================================================
-  // PROFILE CARD
-  // =========================================================
-  Widget _profileCard(ProfileProvider profile) {
+  // ================= PROFILE =================
+  Widget _profileCard(ProfileProvider profile, double w) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(w * 0.04),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF1E3A8A), Color(0xFF14B8A6)],
@@ -206,7 +227,7 @@ class DashboardScreen extends StatelessWidget {
             backgroundColor: Colors.white24,
             child: Icon(Icons.person, color: Colors.white),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: w * 0.03),
 
           Expanded(
             child: Column(
@@ -214,33 +235,20 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   profile.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: w * 0.04,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
                   profile.university,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white70,
-                    fontSize: 12,
+                    fontSize: w * 0.03,
                   ),
                 ),
               ],
-            ),
-          ),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              "STUDENT",
-              style: TextStyle(color: Colors.white, fontSize: 10),
             ),
           ),
         ],
@@ -248,13 +256,11 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // =========================================================
-  // CGPA CARD
-  // =========================================================
-  Widget _cgpaCard(GradeViewModel vm) {
+  // ================= CGPA =================
+  Widget _cgpaCard(GradeViewModel vm, double w) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(w * 0.05),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.06),
         borderRadius: BorderRadius.circular(18),
@@ -262,38 +268,37 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Current CGPA",
-            style: TextStyle(color: Colors.white70, fontSize: 13),
+            style: TextStyle(color: Colors.white70, fontSize: w * 0.03),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: w * 0.02),
 
           Text(
             vm.cgpa.toStringAsFixed(2),
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 40,
+              fontSize: w * 0.10,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 6),
-
-          const Text(
+          Text(
             "Excellent academic performance 🚀",
-            style: TextStyle(color: Colors.tealAccent, fontSize: 12),
+            style: TextStyle(
+              color: Colors.tealAccent,
+              fontSize: w * 0.03,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // =========================================================
-  // MINI CARD
-  // =========================================================
-  Widget _miniCard(String title, String value, IconData icon) {
+  // ================= MINI CARD =================
+  Widget _miniCard(String title, String value, IconData icon, double w) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(w * 0.04),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.06),
         borderRadius: BorderRadius.circular(16),
@@ -301,21 +306,23 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.tealAccent, size: 20),
-          const SizedBox(height: 10),
+          Icon(icon, color: Colors.tealAccent, size: 18),
+          SizedBox(height: w * 0.02),
+
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 18,
+              fontSize: w * 0.045,
               fontWeight: FontWeight.bold,
             ),
           ),
+
           Text(
             title,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 11,
+              color: Colors.white60,
+              fontSize: w * 0.03,
             ),
           ),
         ],
@@ -323,29 +330,33 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // =========================================================
-  // ACTION CARD
-  // =========================================================
+  // ================= ACTION CARD =================
   Widget _actionCard({
     required IconData icon,
     required String title,
+    required double w,
     required VoidCallback onTap,
   }) {
     return InkWell(
+      borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(w * 0.04),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.06),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           children: [
-            Icon(icon, color: Colors.tealAccent),
-            const SizedBox(height: 8),
+            Icon(icon, color: Colors.tealAccent, size: 18),
+            SizedBox(height: w * 0.02),
             Text(
               title,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: w * 0.03,
+              ),
             ),
           ],
         ),
@@ -353,15 +364,18 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // =========================================================
-  // PRIMARY BUTTON
-  // =========================================================
-  Widget _primaryButton(String title, IconData icon, VoidCallback onTap) {
+  // ================= PRIMARY BUTTON =================
+  Widget _primaryButton(
+      String title,
+      IconData icon,
+      double w,
+      VoidCallback onTap,
+      ) {
     return InkWell(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(w * 0.04),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF1E3A8A), Color(0xFF14B8A6)],
@@ -371,12 +385,13 @@ class DashboardScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
+            Icon(icon, color: Colors.white, size: w * 0.045),
+            SizedBox(width: w * 0.02),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
+                fontSize: w * 0.035,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -385,122 +400,6 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
   }
-
-  // =========================================================
-  // INSIGHT CARD
-  // =========================================================
-
-
-
-  /*Widget _emptyDashboard(BuildContext context) {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-
-            // ================= ICON =================
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF14B8A6).withOpacity(0.25),
-                    const Color(0xFF1E3A8A).withOpacity(0.25),
-                  ],
-                ),
-              ),
-              child: const Icon(
-                Icons.school_outlined,
-                size: 42,
-                color: Colors.white,
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            // ================= TITLE =================
-            const Text(
-              "No Semester Added Yet",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // ================= DESCRIPTION =================
-            const Text(
-              "Start by adding your first semester to track SGPA, CGPA and academic progress.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 13,
-                height: 1.4,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // ================= PRIMARY BUTTON =================
-            Container(
-              width: double.infinity,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1E3A8A), Color(0xFF14B8A6)],
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, "/subject");
-                },
-                child: const Text(
-                  "Add First Semester",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // ================= SECONDARY ACTION =================
-            TextButton(
-              onPressed: () {
-                // optional: load demo data
-              },
-              child: const Text(
-                "Explore Demo Data",
-                style: TextStyle(color: Colors.white60),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }*/
 }
 
 

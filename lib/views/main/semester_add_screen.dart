@@ -14,9 +14,7 @@ class EmptyDashboardScreen extends StatefulWidget {
 
 class _EmptyDashboardScreenState extends State<EmptyDashboardScreen>
     with SingleTickerProviderStateMixin {
-
   late AnimationController _controller;
-  late Animation<double> _fade;
   late Animation<double> _scale;
   late Animation<double> _float;
 
@@ -26,20 +24,40 @@ class _EmptyDashboardScreenState extends State<EmptyDashboardScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1800),
+      duration: const Duration(milliseconds: 2800),
     )..repeat(reverse: true);
 
-    _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    // 🔥 Smooth floating motion (no blinking)
+    _float = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: -16.0, end: 12.0).chain(
+          CurveTween(curve: Curves.easeInOutCubic),
+        ),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 12.0, end: -16.0).chain(
+          CurveTween(curve: Curves.easeInOutCubic),
+        ),
+        weight: 50,
+      ),
+    ]).animate(_controller);
 
-    _scale = Tween<double>(begin: 0.92, end: 1.05).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-
-    _float = Tween<double>(begin: -8, end: 8).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    // 🔥 Soft breathing scale (premium UI feel)
+    _scale = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.96, end: 1.05).chain(
+          CurveTween(curve: Curves.easeInOut),
+        ),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.05, end: 0.96).chain(
+          CurveTween(curve: Curves.easeInOut),
+        ),
+        weight: 50,
+      ),
+    ]).animate(_controller);
   }
 
   @override
@@ -50,116 +68,116 @@ class _EmptyDashboardScreenState extends State<EmptyDashboardScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
 
-      body: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Opacity(
-            opacity: _fade.value,
-            child: Column(
-              children: [
+      body: SafeArea(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: width * 0.06),
+              child: Column(
+                children: [
 
-                const Spacer(),
+                  const Spacer(),
 
-                // ================= FLOATING ICON =================
-                Transform.translate(
-                  offset: Offset(0, _float.value),
-                  child: Transform.scale(
-                    scale: _scale.value,
-                    child: Container(
-                      padding: const EdgeInsets.all(34),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF14B8A6),
-                            Color(0xFF1E3A8A),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF14B8A6).withOpacity(0.25),
-                            blurRadius: 40,
-                            spreadRadius: 2,
+                  // ================= ICON =================
+                  Transform.translate(
+                    offset: Offset(0, _float.value),
+                    child: Transform.scale(
+                      scale: _scale.value,
+                      child: Container(
+                        padding: EdgeInsets.all(width * 0.10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF14B8A6),
+                              Color(0xFF1E3A8A),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.school_rounded,
-                        size: 64,
-                        color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF14B8A6).withOpacity(0.25),
+                              blurRadius: 45,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.school_rounded,
+                          size: width * 0.15,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 28),
+                  SizedBox(height: height * 0.03),
 
-                // ================= TITLE =================
-                const Text(
-                  "Start Your Academic Journey",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // ================= DESCRIPTION =================
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28),
-                  child: Text(
-                    "Create your first semester and track SGPA, CGPA, and academic progress in a smart and modern way.",
+                  // ================= TITLE =================
+                  Text(
+                    "Start Your Academic Journey",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 14,
-                      height: 1.6,
+                      color: Colors.white,
+                      fontSize: width * 0.065,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
 
-                const Spacer(),
+                  SizedBox(height: height * 0.015),
 
-                // ================= BUTTON =================
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: SizedBox(
+                  // ================= DESCRIPTION =================
+                  Text(
+                    "Create your first semester and track SGPA, CGPA, and academic progress in a modern smart way.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: width * 0.035,
+                      height: 1.5,
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // ================= BUTTON =================
+                  SizedBox(
                     width: double.infinity,
-                    height: 52,
+                    height: height * 0.065,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF14B8A6),
-                        elevation: 10,
-                        shadowColor: Colors.black45,
+                        elevation: 12,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       onPressed: widget.onCreateSemester,
-                      child: const Text(
+                      child: Text(
                         "Create First Semester",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: width * 0.04,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+
+                  SizedBox(height: height * 0.03),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

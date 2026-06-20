@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/storage/app_prefs.dart';
@@ -53,116 +52,174 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
 
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.06,
+            vertical: height * 0.03,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: height * 0.9,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
-              const SizedBox(height: 20),
-
-              const Text(
-                "Create Your Profile",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              const Text(
-                "Tell us about yourself to personalize GPA tracking",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // ================= INPUTS =================
-              _buildField("Full Name", nameController, Icons.person),
-              const SizedBox(height: 12),
-
-              _buildField("University", uniController, Icons.school),
-              const SizedBox(height: 12),
-
-              _buildField("Degree (e.g BSCS)", degreeController, Icons.menu_book),
-
-              const Spacer(),
-
-              // ================= BUTTON =================
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                    loading ? const Color(0xFF0F766E) : const Color(0xFF14B8A6),
-                    disabledBackgroundColor: const Color(0xFF0F766E).withOpacity(0.6),
-                    elevation: loading ? 0 : 6,
-                    shadowColor: Colors.teal.withOpacity(0.4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-
-                  onPressed: loading ? null : _saveProfile,
-
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-
-                    child: loading
-                        ? const Row(
-                      key: ValueKey("loading"),
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          "Saving...",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
+                // ================= ICON =================
+                Center(
+                  child: Container(
+                    height: width * 0.22,
+                    width: width * 0.22,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF14B8A6), Color(0xFF0EA5E9)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.teal.withOpacity(0.35),
+                          blurRadius: 25,
+                          spreadRadius: 3,
                         ),
                       ],
-                    )
-                        : const Text(
-                      "Continue",
-                      key: ValueKey("text"),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.3,
+                    ),
+                    child: Icon(
+                      Icons.school_rounded,
+                      color: Colors.white,
+                      size: width * 0.10,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: height * 0.04),
+
+                // ================= TITLE =================
+                Text(
+                  "Create Your Profile",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: width * 0.075,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                SizedBox(height: height * 0.01),
+
+                Text(
+                  "Set up your academic profile to personalize GPA tracking and performance insights.",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: width * 0.036,
+                    height: 1.5,
+                  ),
+                ),
+
+                SizedBox(height: height * 0.04),
+
+                // ================= FORM CARD =================
+                Container(
+                  padding: EdgeInsets.all(width * 0.05),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.08),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildField("Full Name", nameController, Icons.person_outline),
+                      SizedBox(height: height * 0.018),
+                      _buildField("University", uniController, Icons.school_outlined),
+                      SizedBox(height: height * 0.018),
+                      _buildField("Degree Program", degreeController, Icons.menu_book_outlined),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: height * 0.05),
+
+                // ================= BUTTON =================
+                SizedBox(
+                  width: double.infinity,
+                  height: height * 0.07,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF14B8A6),
+                      elevation: 10,
+                      shadowColor: Colors.teal.withOpacity(0.4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    onPressed: loading ? null : _saveProfile,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      child: loading
+                          ? Row(
+                        key: const ValueKey("loading"),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: width * 0.05,
+                            width: width * 0.05,
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                          SizedBox(width: width * 0.03),
+                          Text(
+                            "Saving Profile...",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: width * 0.04,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      )
+                          : Text(
+                        "Continue",
+                        key: const ValueKey("text"),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: width * 0.043,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              )
-            ],
+
+                SizedBox(height: height * 0.03),
+
+                Center(
+                  child: Text(
+                    "Your data stays securely on your device",
+                    style: TextStyle(
+                      color: Colors.white38,
+                      fontSize: width * 0.03,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // ================= TEXT FIELD UI =================
+  // ================= FIELD =================
   Widget _buildField(
       String hint,
       TextEditingController controller,
@@ -170,19 +227,22 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       ) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: TextField(
         controller: controller,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.white70),
+          border: InputBorder.none,
+          prefixIcon: Icon(icon, color: const Color(0xFF14B8A6)),
           hintText: hint,
           hintStyle: const TextStyle(color: Colors.white54),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 18,
+          ),
         ),
       ),
     );

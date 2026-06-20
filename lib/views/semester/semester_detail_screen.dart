@@ -469,65 +469,88 @@ class _SemesterDetailScreenState extends State<SemesterDetailScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 20,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+        final size = MediaQuery.of(context).size;
+        final viewInsets = MediaQuery.of(context).viewInsets;
 
-              const Text(
-                "Edit Subject",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.only(bottom: viewInsets.bottom),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: size.width * 0.04,
+                  vertical: size.height * 0.02,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+
+                    // ================= TITLE =================
+                    Text(
+                      "Edit Subject",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: size.width * 0.045,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    SizedBox(height: size.height * 0.02),
+
+                    // ================= FIELDS =================
+                    _field("Subject Name", nameCtrl),
+                    SizedBox(height: size.height * 0.012),
+
+                    _field("Credit Hours", creditCtrl, number: true),
+                    SizedBox(height: size.height * 0.012),
+
+                    _field("Grade (A/B/C)", gradeCtrl),
+                    SizedBox(height: size.height * 0.012),
+
+                    _field("Semester", semCtrl, number: true),
+
+                    SizedBox(height: size.height * 0.025),
+
+                    // ================= BUTTON =================
+                    SizedBox(
+                      width: double.infinity,
+                      height: size.height * 0.06,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF14B8A6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () async {
+                          subject.name = nameCtrl.text;
+                          subject.credit =
+                              int.tryParse(creditCtrl.text) ?? subject.credit;
+                          subject.grade = gradeCtrl.text;
+                          subject.semester =
+                              int.tryParse(semCtrl.text) ?? subject.semester;
+
+                          await subject.save();
+                          vm.notifyListeners();
+
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Save Changes",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: size.width * 0.04,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 16),
-
-              _field("Subject Name", nameCtrl),
-              const SizedBox(height: 10),
-              _field("Credit Hours", creditCtrl, number: true),
-              const SizedBox(height: 10),
-              _field("Grade (A/B/C)", gradeCtrl),
-              const SizedBox(height: 10),
-              _field("Semester", semCtrl, number: true),
-
-              const SizedBox(height: 20),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF14B8A6),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: () async {
-
-                    subject.name = nameCtrl.text;
-                    subject.credit = int.tryParse(creditCtrl.text) ?? subject.credit;
-                    subject.grade = gradeCtrl.text;
-                    subject.semester = int.tryParse(semCtrl.text) ?? subject.semester;
-
-                    await subject.save();
-
-                    vm.notifyListeners();
-
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    "Save Changes",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -572,78 +595,95 @@ class _SemesterDetailScreenState extends State<SemesterDetailScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       builder: (_) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 20,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+        final size = MediaQuery.of(context).size;
+        final viewInsets = MediaQuery.of(context).viewInsets;
 
-              // TITLE
-              const Text(
-                "Edit Semester",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.only(bottom: viewInsets.bottom),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: size.width * 0.04,
+                  vertical: size.height * 0.02,
                 ),
-              ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
 
-              const SizedBox(height: 16),
-
-              // INPUT
-              TextField(
-                controller: controller,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "Semester Number",
-                  hintStyle: const TextStyle(color: Colors.white54),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.05),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // SAVE BUTTON
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF14B8A6),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    // ================= TITLE =================
+                    Text(
+                      "Edit Semester",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: size.width * 0.045,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  onPressed: () async {
-                    final newSem = int.tryParse(controller.text);
 
-                    if (newSem == null || newSem <= 0) return;
+                    SizedBox(height: size.height * 0.02),
 
-                    await vm.updateSemester(sem, newSem);
-
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    "Save Changes",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                    // ================= INPUT =================
+                    TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: "Semester Number",
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.06),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: size.width * 0.04,
+                          vertical: size.height * 0.018,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
                     ),
-                  ),
+
+                    SizedBox(height: size.height * 0.025),
+
+                    // ================= BUTTON =================
+                    SizedBox(
+                      width: double.infinity,
+                      height: size.height * 0.06,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF14B8A6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () async {
+                          final newSem = int.tryParse(controller.text);
+
+                          if (newSem == null || newSem <= 0) return;
+
+                          await vm.updateSemester(sem, newSem);
+
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Save Changes",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: size.width * 0.04,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: size.height * 0.01),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         );
       },

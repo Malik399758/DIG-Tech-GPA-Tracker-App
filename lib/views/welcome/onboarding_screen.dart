@@ -68,36 +68,42 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
+    final width = size.width;
+    final height = size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
 
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 20),
+
+            SizedBox(height: height * 0.025),
 
             // HEADER
-            const Text(
+            Text(
               "GradeFlow",
               style: TextStyle(
-                fontSize: 26,
+                fontSize: width * 0.065,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
                 letterSpacing: 1.2,
               ),
             ),
 
-            const Text(
+            SizedBox(height: height * 0.005),
+
+            Text(
               "Your Academic Intelligence App",
               style: TextStyle(
-                fontSize: 13,
+                fontSize: width * 0.032,
                 color: Colors.white70,
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.025),
 
-            // PAGE VIEW
+            // PAGEVIEW
             Expanded(
               child: PageView.builder(
                 controller: controller,
@@ -112,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       duration: const Duration(milliseconds: 400),
                       scale: index == i ? 1 : 0.95,
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(width * 0.05),
                         child: Container(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
@@ -120,59 +126,67 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                 Color(0xFF132A4A),
                                 Color(0xFF0F223D),
                               ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
                             ),
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius:
+                            BorderRadius.circular(width * 0.06),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              )
+                                color: Colors.black.withOpacity(.30),
+                                blurRadius: width * 0.05,
+                                offset: Offset(0, height * 0.01),
+                              ),
                             ],
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+
+                              // ICON
                               AnimatedContainer(
-                                duration: const Duration(milliseconds: 500),
-                                height: size.width * 0.4,
-                                width: size.width * 0.4,
+                                duration:
+                                const Duration(milliseconds: 500),
+                                height: width * 0.40,
+                                width: width * 0.40,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.withOpacity(.10),
                                 ),
                                 child: Icon(
                                   page["icon"] as IconData,
-                                  size: 90,
+                                  size: width * 0.20,
                                   color: const Color(0xFF14B8A6),
                                 ),
                               ),
 
-                              const SizedBox(height: 30),
+                              SizedBox(height: height * 0.04),
 
-                              Text(
-                                page["title"].toString(),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              // TITLE
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.06),
+                                child: Text(
+                                  page["title"].toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: width * 0.060,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
 
-                              const SizedBox(height: 12),
+                              SizedBox(height: height * 0.015),
 
+                              // DESCRIPTION
                               Padding(
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 24),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.08),
                                 child: Text(
                                   page["desc"].toString(),
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    height: 1.5,
+                                  style: TextStyle(
+                                    fontSize: width * 0.036,
+                                    height: 1.6,
                                     color: Colors.white70,
                                   ),
                                 ),
@@ -187,65 +201,82 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               ),
             ),
 
-            // INDICATOR (MODERN)
+            // INDICATOR
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(pages.length, (i) {
-                final isActive = index == i;
+              children: List.generate(
+                pages.length,
+                    (i) {
+                  final isActive = index == i;
 
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  height: 8,
-                  width: isActive ? 26 : 8,
-                  decoration: BoxDecoration(
-                    color:
-                    isActive ? const Color(0xFF14B8A6) : Colors.white24,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                );
-              }),
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: width * 0.01,
+                    ),
+                    height: height * 0.010,
+                    width: isActive
+                        ? width * 0.065
+                        : width * 0.020,
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? const Color(0xFF14B8A6)
+                          : Colors.white24,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  );
+                },
+              ),
             ),
 
-            const SizedBox(height: 25),
+            SizedBox(height: height * 0.03),
 
             // BUTTON
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(width * 0.04),
               child: SizedBox(
                 width: double.infinity,
-                height: 52,
+                height: height * 0.065,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF14B8A6),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius:
+                      BorderRadius.circular(width * 0.035),
                     ),
                   ),
                   onPressed: () async {
-                    final prefs = await SharedPreferences.getInstance();
+                    final prefs =
+                    await SharedPreferences.getInstance();
+
                     final appPrefs = AppPrefs(prefs);
 
                     if (index == pages.length - 1) {
                       await appPrefs.setOnboardingDone();
 
-                      final isProfileDone = appPrefs.isProfileDone;
+                      final isProfileDone =
+                          appPrefs.isProfileDone;
 
                       Navigator.pushReplacementNamed(
                         context,
-                        isProfileDone ? AppRoutes.dashboard : "/profile",
+                        isProfileDone
+                            ? AppRoutes.dashboard
+                            : "/profile",
                       );
                     } else {
                       controller.nextPage(
-                        duration: const Duration(milliseconds: 400),
+                        duration:
+                        const Duration(milliseconds: 400),
                         curve: Curves.easeInOut,
                       );
                     }
                   },
                   child: Text(
-                    index == pages.length - 1 ? "Get Started" : "Next",
-                    style: const TextStyle(
-                      fontSize: 15,
+                    index == pages.length - 1
+                        ? "Get Started"
+                        : "Next",
+                    style: TextStyle(
+                      fontSize: width * 0.040,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),

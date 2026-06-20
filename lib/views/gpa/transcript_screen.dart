@@ -386,6 +386,8 @@ class TranscriptScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = context.watch<GradeViewModel>();
     final data = vm.groupedBySemester;
+    final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
 
 
     return Scaffold(
@@ -398,20 +400,63 @@ class TranscriptScreen extends StatelessWidget {
         title: const Text("Academic Transcript"),
 
         actions: [
-          IconButton(
-            icon: const Icon(Icons.download_rounded),
-            onPressed: () async {
-              final pdf = await FullTranscriptPdf.generate(
-                subjects: vm.subjects,
-                cgpa: vm.cgpa,
-                scale: vm.scale,
-              );
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Builder(
+              builder: (context) {
+                final size = MediaQuery.of(context).size;
 
-              await Printing.layoutPdf(
-                onLayout: (_) => pdf,
-              );
-            },
-          )
+                final double buttonSize =
+                (size.width * 0.10).clamp(40.0, 52.0);
+
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(30),
+                    onTap: () async {
+                      final pdf = await FullTranscriptPdf.generate(
+                        subjects: vm.subjects,
+                        cgpa: vm.cgpa,
+                        scale: vm.scale,
+                      );
+
+                      await Printing.layoutPdf(
+                        onLayout: (_) => pdf,
+                      );
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      height: buttonSize,
+                      width: buttonSize,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF14B8A6),
+                            Color(0xFF1E3A8A),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 8,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.download_rounded,
+                        color: Colors.white,
+                        size: buttonSize * 0.45,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
 
@@ -444,8 +489,8 @@ class TranscriptScreen extends StatelessWidget {
                   child: Text(
                     vm.cgpa.toStringAsFixed(2),
                     key: ValueKey(vm.cgpa),
-                    style: const TextStyle(
-                      fontSize: 40,
+                    style: TextStyle(
+                      fontSize: isTablet ? 32 : 40,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -481,7 +526,7 @@ class TranscriptScreen extends StatelessWidget {
                 final subjects = data[sem]!;
                 final sgpa = vm.sgpaBySemester(sem);
 
-                return _semesterCard(vm, sem, subjects,sgpa);
+                return _semesterCard(context, vm, sem, subjects, sgpa);
               },
             ),
           ),
@@ -492,15 +537,17 @@ class TranscriptScreen extends StatelessWidget {
 
   // ================= SEMESTER CARD =================
   Widget _semesterCard(
+      BuildContext context,
       GradeViewModel vm,
       int sem,
       List<SubjectModel> subjects,
       double sgpa,
       ) {
+    final size = MediaQuery.of(context).size;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.only(bottom: 16),
-
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: const LinearGradient(
@@ -508,18 +555,17 @@ class TranscriptScreen extends StatelessWidget {
         ),
         border: Border.all(color: Colors.white12),
       ),
-
       child: Theme(
         data: ThemeData.dark().copyWith(dividerColor: Colors.transparent),
-
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          tilePadding: EdgeInsets.symmetric(
+            horizontal: size.width * 0.04,
+            vertical: size.height * 0.01,
+          ),
           childrenPadding: const EdgeInsets.only(bottom: 14),
-
           iconColor: Colors.tealAccent,
           collapsedIconColor: Colors.white60,
 
-          // ================= HEADER =================
           title: Row(
             children: [
               Column(
@@ -544,8 +590,7 @@ class TranscriptScreen extends StatelessWidget {
               const Spacer(),
 
               Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
                   color: Colors.teal.withOpacity(0.15),
@@ -563,7 +608,6 @@ class TranscriptScreen extends StatelessWidget {
             ],
           ),
 
-          // ================= SUBJECT LIST =================
           children: subjects.map((s) {
             final gp = vm.gradePoint(s.grade);
             final qp = s.credit * gp;
@@ -571,13 +615,11 @@ class TranscriptScreen extends StatelessWidget {
             return Container(
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               padding: const EdgeInsets.all(12),
-
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.04),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: Colors.white10),
               ),
-
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -588,9 +630,7 @@ class TranscriptScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-
                   const SizedBox(height: 10),
-
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
