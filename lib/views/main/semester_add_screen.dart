@@ -27,7 +27,7 @@ class _EmptyDashboardScreenState extends State<EmptyDashboardScreen>
       duration: const Duration(milliseconds: 2800),
     )..repeat(reverse: true);
 
-    // 🔥 Smooth floating motion (no blinking)
+    /// Smooth floating motion (no blinking)
     _float = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween(begin: -16.0, end: 12.0).chain(
@@ -43,7 +43,7 @@ class _EmptyDashboardScreenState extends State<EmptyDashboardScreen>
       ),
     ]).animate(_controller);
 
-    // 🔥 Soft breathing scale (premium UI feel)
+    /// Soft breathing scale (premium UI feel)
     _scale = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween(begin: 0.96, end: 1.05).chain(

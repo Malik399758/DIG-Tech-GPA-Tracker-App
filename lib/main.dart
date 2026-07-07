@@ -64,7 +64,7 @@ class GradeFlowApp extends StatelessWidget {
           ),
 
           iconTheme: IconThemeData(
-            color: Colors.white, // back arrow + icons
+            color: Colors.white,
           ),
         ),
 

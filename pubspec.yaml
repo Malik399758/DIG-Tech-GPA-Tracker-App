@@ -31,37 +31,21 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # 🧠 State Management
-  provider: ^6.1.2
 
-  # 💾 Offline Database (Core)
+  provider: ^6.1.2
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-
-  # 🌙 UI & Fonts
   google_fonts: ^6.2.1
   cupertino_icons: ^1.0.8
   iconsax: ^0.0.8
-
-  # 📊 Charts (Analytics)
   fl_chart: ^0.69.0
-
-  # 📄 PDF Export (Transcript)
   pdf: ^3.11.0
   printing: ^5.13.0
-
-  # 📤 File System (Backup/Restore)
   path_provider: ^2.1.4
-
-  # 🔧 Utilities
   intl: ^0.20.2
   uuid: ^4.5.1
   shared_preferences: ^2.5.5
-
-  # ✨ Animations (UI polish)
   animate_do: ^3.3.4
-
-  # 🧭 Navigation (optional advanced routing)
   go_router: ^14.2.7
   share_plus: ^11.0.0
   flutter_launcher_icons: ^0.14.4

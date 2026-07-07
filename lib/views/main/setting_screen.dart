@@ -552,6 +552,7 @@ import 'package:provider/provider.dart';
 import '../../cons/widgets/text_field_widget.dart';
 import '../../core/providers/profile_provider.dart';
 import '../../viewmodel/grades/grade_view_model.dart';
+import '../predictor/goal_gpa_predictor.dart';
 import '../privacy/privacy_policy_screen.dart';
 import '../privacy/terms_conditions_screen.dart';
 import 'academic_setting_screen.dart';
@@ -589,7 +590,7 @@ class SettingsScreen extends StatelessWidget {
                 const SnackBar(content: Text("All data deleted")),
               );
             },
-            child: const Text("Reset"),
+            child: Text("Reset",style: GoogleFonts.poppins(color: Colors.white),),
           ),
         ],
       ),
@@ -621,7 +622,9 @@ class SettingsScreen extends StatelessWidget {
                 SystemNavigator.pop();
               });
             },
-            child: const Text("Exit"),
+            child: Text("Exit",style: GoogleFonts.poppins(
+              color: Colors.white
+            ),),
           ),
         ],
       ),
@@ -726,6 +729,31 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 );
               }),
+          Text(
+            "Academic Tools",
+            style: TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.w600,
+              fontSize: w * 0.035,
+            ),
+          ),
+          SizedBox(height: h * 0.015),
+
+          _tile(
+            context,
+            Icons.track_changes,
+            "Goal GPA Predictor",
+            "Predict GPA needed for target CGPA",
+            w,
+                () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const GoalGpaPredictorScreen(),
+                ),
+              );
+            },
+          ),
 
           SizedBox(height: h * 0.02),
 
