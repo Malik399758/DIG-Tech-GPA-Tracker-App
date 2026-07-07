@@ -9,20 +9,19 @@ class ProfileProvider extends ChangeNotifier {
     loadProfile();
   }
 
+
   String _name = "";
   String _university = "";
 
   String get name => _name;
   String get university => _university;
 
-  // ================= LOAD =================
   void loadProfile() {
     _name = prefs.getName();
     _university = prefs.getUniversity();
     notifyListeners();
   }
 
-  // ================= UPDATE =================
   Future<void> updateProfile(String name, String university) async {
     await prefs.setProfileDone(
       name: name,
