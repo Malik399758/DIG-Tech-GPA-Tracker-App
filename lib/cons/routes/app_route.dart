@@ -7,7 +7,7 @@ import '../../views/welcome/profile_screen.dart';
 import '../../views/welcome/splash_screen.dart';
 
 class AppRoutes {
-  // ROUTE NAMES
+
   static const String splash = "/";
   static const String onboarding = "/onboarding";
   static const String dashboard = "/dashboard";
