@@ -4,6 +4,7 @@ import '../model/subject_model.dart';
 
 class HiveBoxes {
 
+  // Hive
   static const String subjectBox = "subjects";
 
   static Box<SubjectModel> getSubjects() =>
