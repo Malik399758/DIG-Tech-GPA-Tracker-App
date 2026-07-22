@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:grade_flow/views/gpa/add_subject_screen.dart';
 import 'package:grade_flow/views/gpa/analysis_screen.dart';
 import 'package:grade_flow/views/gpa/transcript_screen.dart';
@@ -54,7 +55,7 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                       Text(
                         "Dashboard",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: w * 0.07,
                           fontWeight: FontWeight.w800,

@@ -27,9 +27,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => GradeViewModel(appPrefs),
-        ),
+        ChangeNotifierProvider(create: (_) => GradeViewModel(appPrefs)),
 
         ChangeNotifierProvider(
           create: (_) => ProfileProvider(appPrefs)..loadProfile(),
@@ -63,9 +61,7 @@ class GradeFlowApp extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
 
-          iconTheme: IconThemeData(
-            color: Colors.white,
-          ),
+          iconTheme: IconThemeData(color: Colors.white),
         ),
 
         scaffoldBackgroundColor: Colors.white,

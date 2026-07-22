@@ -545,6 +545,7 @@ class SettingsScreen extends StatelessWidget {
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grade_flow/cons/widgets/app_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../cons/widgets/text_field_widget.dart';
@@ -643,10 +644,8 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "Settings",
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontSize: w * 0.045,
-          ),
+          style: AppFonts.poppins(size: 20,context,color: Colors.white,
+          weight: FontWeight.w600)
         ),
         backgroundColor: const Color(0xFF0B1F3A),
         iconTheme: const IconThemeData(color: Colors.white),

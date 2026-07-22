@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grade_flow/cons/widgets/app_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodel/grades/grade_view_model.dart';
 
@@ -165,7 +166,8 @@ class _AddSubjectScreenState extends State<AddSubjectScreen>
       backgroundColor: const Color(0xFF0B1F3A),
 
       appBar: AppBar(
-        title: const Text("Add Semester"),
+        title: Text("Add Semester",style: AppFonts.poppins(size: 20,context,
+        color: Colors.white,weight: FontWeight.w600),),
         backgroundColor: const Color(0xFF0B1F3A),
         foregroundColor: Colors.white,
         elevation: 0,

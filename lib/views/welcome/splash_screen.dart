@@ -27,13 +27,15 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _scale = Tween<double>(begin: 0.9, end: 1.1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scale = Tween<double>(
+      begin: 0.9,
+      end: 1.1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _fade = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fade = Tween<double>(
+      begin: 0.3,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     initApp();
   }
@@ -63,11 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF0B1F3A),
-              Color(0xFF132A4A),
-              Color(0xFF1E3A8A),
-            ],
+            colors: [Color(0xFF0B1F3A), Color(0xFF132A4A), Color(0xFF1E3A8A)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -79,7 +77,6 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 // ================= LOGO =================
                 ScaleTransition(
                   scale: _scale,
@@ -96,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
                           color: Colors.black.withOpacity(0.4),
                           blurRadius: 20,
                           spreadRadius: 2,
-                        )
+                        ),
                       ],
                     ),
                     child: const Icon(

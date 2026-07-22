@@ -66,13 +66,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             vertical: height * 0.03,
           ),
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: height * 0.9,
-            ),
+            constraints: BoxConstraints(minHeight: height * 0.9),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 // ================= ICON =================
                 Center(
                   child: Container(
@@ -130,17 +127,27 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.08),
-                    ),
+                    border: Border.all(color: Colors.white.withOpacity(0.08)),
                   ),
                   child: Column(
                     children: [
-                      _buildField("Full Name", nameController, Icons.person_outline),
+                      _buildField(
+                        "Full Name",
+                        nameController,
+                        Icons.person_outline,
+                      ),
                       SizedBox(height: height * 0.018),
-                      _buildField("University", uniController, Icons.school_outlined),
+                      _buildField(
+                        "University",
+                        uniController,
+                        Icons.school_outlined,
+                      ),
                       SizedBox(height: height * 0.018),
-                      _buildField("Degree Program", degreeController, Icons.menu_book_outlined),
+                      _buildField(
+                        "Degree Program",
+                        degreeController,
+                        Icons.menu_book_outlined,
+                      ),
                     ],
                   ),
                 ),
@@ -165,37 +172,37 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                       duration: const Duration(milliseconds: 250),
                       child: loading
                           ? Row(
-                        key: const ValueKey("loading"),
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: width * 0.05,
-                            width: width * 0.05,
-                            child: const CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                          SizedBox(width: width * 0.03),
-                          Text(
-                            "Saving Profile...",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: width * 0.04,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      )
+                              key: const ValueKey("loading"),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: width * 0.05,
+                                  width: width * 0.05,
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                SizedBox(width: width * 0.03),
+                                Text(
+                                  "Saving Profile...",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: width * 0.04,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            )
                           : Text(
-                        "Continue",
-                        key: const ValueKey("text"),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: width * 0.043,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                              "Continue",
+                              key: const ValueKey("text"),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: width * 0.043,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -221,10 +228,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   // ================= FIELD =================
   Widget _buildField(
-      String hint,
-      TextEditingController controller,
-      IconData icon,
-      ) {
+    String hint,
+    TextEditingController controller,
+    IconData icon,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.04),

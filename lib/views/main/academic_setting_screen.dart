@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grade_flow/cons/widgets/app_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodel/grades/grade_view_model.dart';
@@ -11,7 +12,10 @@ class AcademicSettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0B1F3A),
       appBar: AppBar(
-        title: const Text("Academic Settings"),
+        title: Text("Academic Settings",style: AppFonts.poppins(
+            context,
+            size: 20,
+        color: Colors.white),),
         backgroundColor: const Color(0xFF0B1F3A),
       ),
 
